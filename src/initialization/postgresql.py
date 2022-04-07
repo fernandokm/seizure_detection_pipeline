@@ -54,15 +54,14 @@ def fill_table(cursor, table, content):
 
 def get_data_from_csv(filepath):
     """
-    Not used
+    Transforms data from csv to list of dicts for each line
     """
     with open(filepath, "r") as csv_file:
-        reader = csv.DictReader(csv_file)
-        return list(reader)
+        return csv.DictReader(csv_file)
 
 def get_data_from_csv_dict(csv_files):
     """
-    Not used
+    Transforms data from dict of csv files (table name: csv filepath) to push_postgresql data format
     """
     data = {}
     for table, filepath in csv_files.items():
