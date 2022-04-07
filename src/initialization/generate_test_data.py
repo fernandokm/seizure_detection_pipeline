@@ -23,7 +23,9 @@ EDF_SOURCES = {
     3281: "data/tuh/dev/01_tcp_ar/002/00003281/00003281_s001_t001.edf"
 }
 
-CSV_SOURCES = {}
+CSV_SOURCES = {
+    3281: "output/cons_00003281_s001_t001_t001.csv"
+}
 
 def generate_postgresql_data(csv_files):
     """
@@ -38,7 +40,7 @@ def generate_postgresql_data(csv_files):
         password=POSTGRES_PASSWORD,
     )
 
-def generate_influxdb_data(edf_files, T_sample=1):
+def generate_influxdb_data(edf_files=[], csv_files=[], T_sample=1):
     """
     Generate data in influxdb from edf files
     edf_files: input edf files []
@@ -46,6 +48,8 @@ def generate_influxdb_data(edf_files, T_sample=1):
     """
     for patient, file in edf_files.items():
         influxDB.push_ecg_to_influxdb(file, patient=patient, host=IDB_HOST, port=IDB_PORT, username=IDB_USERNAME, password=IDB_PASSWORD, database=IDB_DATABASE)
+    for patient, file in csv_files.items():
+        influxDB.push_csv_features_to_influxdb(file, patient=patient, host=IDB_HOST, port=IDB_PORT, username=IDB_USERNAME, password=IDB_PASSWORD, database=IDB_DATABASE)
 
 
 def log(msg):
@@ -56,6 +60,6 @@ def log(msg):
 
 if __name__ == "__main__":
     log("Starting execution")
-    generate_postgresql_data(CSV_SOURCES)
-    generate_influxdb_data(EDF_SOURCES)
+    # generate_postgresql_data(CSV_SOURCES)
+    generate_influxdb_data({}, CSV_SOURCES)
     log("Execution finished")
