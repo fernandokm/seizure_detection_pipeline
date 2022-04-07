@@ -13,6 +13,7 @@ export POSTGRES_HOST_URL=postgres
 export POSTGRES_DATABASE=postgres
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=wdkjsdk8hcjbw
+export POSTGRES_LOCALHOST=localhost
 
 
 # Ports
