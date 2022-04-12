@@ -40,7 +40,7 @@ def generate_postgresql_data(csv_files: dict = {}):
 def generate_influxdb_data(edf_files: dict = {}, csv_files: dict = {}):
     """ 
     Generate data in influxdb from edf files
-    edf_files: input edf files []
+    edf_files: input edf files {}
     """
     for patient, file in edf_files.items():
         influxDB.push_ecg_to_influxdb(file, patient=patient, host=IDB_HOST, port=IDB_PORT,
