@@ -7,6 +7,7 @@ import rx
 import sys
 import datetime
 from math import floor
+from numpy import float64
 
 sys.path.append(".")
 from src.infrastructure.edf_loader import EdfLoader
@@ -41,13 +42,13 @@ def from_edf(filepath: str, channel: int, mesurement: Union[str, None] = None, t
     mesurement = escape(mesurement or filepath)
     with EdfReader(filepath) as r:
         T_sample_real = 1/r.getSampleFrequency(channel)
-        time = r.getStartdatetime().timestamp()
+        time = r.getStartdatetime()
         tagslist = ",".join([f"{escape(k)}={escape(v)}" for k, v in tags.items()] + [f"channel={escape(r.getSignalLabels()[channel])}"])
         tagslist = f",{tagslist}" if tagslist else ""
         for val in r.readSignal(channel):
             yield f"{mesurement}{tagslist} {escape(field)}={escapevalue(val)} {to_nanoseconds(time)}"
             # yield Point(f"{mesurement}").tag("channel",f"{channel}").field(f"Tension (uV)", val).time(time)
-            time += T_sample_real
+            time += datetime.timedelta(seconds=T_sample_real)
 
 def push_ecg_to_influxdb(ecg_filepath: str, **kwargs) -> None:
     loader = EdfLoader(ecg_filepath)
@@ -109,9 +110,7 @@ def to_nanoseconds(date_time: Any, mult_to_seconds=1):
             return int(float(date_time)*mult)
         except:
             return int(datetime.datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S.%f").timestamp()*1e9)
-    elif type(date_time) == int:
-        return int(date_time*mult)
-    elif type(date_time) == float:
+    elif type(date_time) in [int, float, float64]:
         return int(date_time*mult)
     elif type(date_time) == datetime.datetime:
         return int(date_time.timestamp()*1e9)

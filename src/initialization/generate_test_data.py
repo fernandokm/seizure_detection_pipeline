@@ -61,5 +61,5 @@ def log(msg):
 if __name__ == "__main__":
     log("Starting execution")
     # generate_postgresql_data(CSV_SOURCES)
-    generate_influxdb_data({}, CSV_SOURCES)
+    generate_influxdb_data(EDF_SOURCES, CSV_SOURCES)
     log("Execution finished")
