@@ -1,10 +1,5 @@
-import psycopg2
 import os
-import csv
-from influxdb_client import InfluxDBClient, Point, WriteOptions
-import pyedflib
-from datetime import datetime, timedelta
-import rx
+from datetime import datetime
 import influxDB
 import postgresql
 
@@ -27,7 +22,8 @@ CSV_SOURCES = {
     3281: "output/cons_00003281_s001_t001_t001.csv"
 }
 
-def generate_postgresql_data(csv_files):
+
+def generate_postgresql_data(csv_files: dict = {}):
     """
     Generate data in postgresql from csv files
     """
@@ -40,16 +36,18 @@ def generate_postgresql_data(csv_files):
         password=POSTGRES_PASSWORD,
     )
 
-def generate_influxdb_data(edf_files=[], csv_files=[], T_sample=1):
-    """
+
+def generate_influxdb_data(edf_files: dict = {}, csv_files: dict = {}):
+    """ 
     Generate data in influxdb from edf files
     edf_files: input edf files []
-    T_sample: later
     """
     for patient, file in edf_files.items():
-        influxDB.push_ecg_to_influxdb(file, patient=patient, host=IDB_HOST, port=IDB_PORT, username=IDB_USERNAME, password=IDB_PASSWORD, database=IDB_DATABASE)
+        influxDB.push_ecg_to_influxdb(file, patient=patient, host=IDB_HOST, port=IDB_PORT,
+                                      username=IDB_USERNAME, password=IDB_PASSWORD, database=IDB_DATABASE)
     for patient, file in csv_files.items():
-        influxDB.push_csv_features_to_influxdb(file, patient=patient, host=IDB_HOST, port=IDB_PORT, username=IDB_USERNAME, password=IDB_PASSWORD, database=IDB_DATABASE)
+        influxDB.push_csv_features_to_influxdb(
+            file, patient=patient, host=IDB_HOST, port=IDB_PORT, username=IDB_USERNAME, password=IDB_PASSWORD, database=IDB_DATABASE)
 
 
 def log(msg):
@@ -57,6 +55,7 @@ def log(msg):
     Log message
     """
     print(f"{datetime.now().strftime('%H:%M:%S')}: {msg}")
+
 
 if __name__ == "__main__":
     log("Starting execution")
