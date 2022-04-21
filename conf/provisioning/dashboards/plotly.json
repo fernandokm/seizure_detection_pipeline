@@ -1,0 +1,136 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": "-- Grafana --",
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 0,
+    "links": [],
+    "panels": [
+        {
+            "datasource": "Postgres",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 10,
+                "x": 0,
+                "y": 0
+            },
+            "id": 2,
+            "options": {
+                "config": {
+                    "displayModeBar": false
+                },
+                "data": [
+                    {
+                        "orientation": "h",
+                        "type": "bar"
+                    }
+                ],
+                "layout": {
+                    "font": {
+                        "color": "darkgrey"
+                    },
+                    "margin": {
+                        "b": 20,
+                        "l": 170,
+                        "t": 30
+                    },
+                    "paper_bgcolor": "rgba(0,0,0,0)",
+                    "plot_bgcolor": "rgba(0,0,0,0)",
+                    "showlegend": false
+                },
+                "onclick": "console.log(data)\nwindow.updateVariables({query:{'var-project':'test'}, partial: true})",
+                "script": "console.log(data)\nvar x = data.series[0].fields[0].values.buffer;\nvar y = data.series[1].fields[0].values.buffer;\nvar x_pos = [];\nvar x_neg = [];\nvar y_pos = [];\nvar y_neg = [];\nfor (var i = 0; i < x.length; i++) {\n  if (x[i] > 0) {\n    x_pos.push(x[i]);\n    y_pos.push(y[i]);\n  } else {\n    x_neg.push(x[i]);\n    y_neg.push(y[i]);\n  };\n};\nconsole.log(x_pos, x_neg)\n\nvar trace_pos = {\n  x: x_pos,\n  y: y_pos,\n  type:\"bar\",\n  orientation: \"h\",\n  marker:{\n    color:\"#23c43e\"\n  }\n};\nvar trace_neg = {\n  x: x_neg,\n  y: y_neg,\n  type:\"bar\",\n  orientation: \"h\",\n  marker:{\n    color:\"#eb4034\"\n  }\n};\n\n\nreturn {data:[trace_pos, trace_neg]};\n"
+            },
+            "pluginVersion": "7.3.4",
+            "targets": [
+                {
+                    "format": "table",
+                    "group": [],
+                    "metricColumn": "none",
+                    "queryType": "randomWalk",
+                    "rawQuery": true,
+                    "rawSql": "SELECT\n  number\nFROM my_test_table_2",
+                    "refId": "A",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "number"
+                                ],
+                                "type": "column"
+                            }
+                        ]
+                    ],
+                    "table": "my_test_table_2",
+                    "timeColumn": "\"time\"",
+                    "timeColumnType": "timestamp",
+                    "where": []
+                },
+                {
+                    "format": "table",
+                    "group": [],
+                    "metricColumn": "none",
+                    "rawQuery": true,
+                    "rawSql": "SELECT\n  letter\nFROM my_test_table_2",
+                    "refId": "B",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "value_double"
+                                ],
+                                "type": "column"
+                            }
+                        ]
+                    ],
+                    "table": "test_data",
+                    "timeColumn": "time_date_time",
+                    "timeColumnType": "timestamp",
+                    "where": [
+                        {
+                            "name": "$__timeFilter",
+                            "params": [],
+                            "type": "macro"
+                        }
+                    ]
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Panel Title",
+            "type": "ae3e-plotly-panel"
+        }
+    ],
+    "schemaVersion": 26,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Plotly panel",
+    "uid": "I6mfmZwnk",
+    "version": 3
+}
