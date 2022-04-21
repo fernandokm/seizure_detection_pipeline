@@ -96,45 +96,4 @@ def get_data_from_csv_dict(csv_files):
 
 if __name__ == "__main__":
 
-    def string_to_date(string):
-        return datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
-
-    # data = {"my_test_table_2": [{"time": string_to_date("2022-01-18 06:03:41"), "letter": "A", "number": 2.0}, {"time": string_to_date("2022-01-18 07:03:41"), "letter": "B", "number": -4.3}, {
-    #     "time": string_to_date("2022-01-18 08:03:41"), "letter": "C", "number": 5.1}, {"time": string_to_date("2022-01-18 09:03:41"), "letter": "D", "number": 0.0}, {"time": string_to_date("2022-01-18 10:03:41"), "letter": "E", "number": 1.2}]}
-    # push_postgresql_data(data, "localhost", "grafana",
-    #                      "postgres", "wdkjsdk8hcjbw")
-    data = {
-        "my_test_table_2": [
-            {
-                "time": string_to_date("2022-01-18 06:03:41"),
-                "letter": "sdnn > 45.06",
-                "number": 0.047,
-            },
-            {
-                "time": string_to_date("2022-01-18 07:03:41"),
-                "letter": "38.08 < rmssd <= 47.95",
-                "number": -0.0125,
-            },
-            {
-                "time": string_to_date("2022-01-18 08:03:41"),
-                "letter": "median_nni > 710.00",
-                "number": 0.011,
-            },
-            {
-                "time": string_to_date("2022-01-18 09:03:41"),
-                "letter": "0.05 < cvsd <= 0.06",
-                "number": -0.009,
-            },
-            {
-                "time": string_to_date("2022-01-18 10:03:41"),
-                "letter": "1.00 < nni_50 <= 3.00",
-                "number": -0.006,
-            },
-            {
-                "time": string_to_date("2022-01-18 10:03:41"),
-                "letter": "lf > 808.47",
-                "number": 0.008,
-            },
-        ]
-    }
-    push_postgresql_data(data, "localhost", "grafana", "postgres", "wdkjsdk8hcjbw")
+    pass
