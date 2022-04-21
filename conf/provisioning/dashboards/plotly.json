@@ -27,7 +27,7 @@
             },
             "gridPos": {
                 "h": 9,
-                "w": 10,
+                "w": 24,
                 "x": 0,
                 "y": 0
             },
@@ -38,6 +38,7 @@
                 },
                 "data": [
                     {
+                        "hoverinfo": "",
                         "orientation": "h",
                         "type": "bar"
                     }
@@ -66,29 +67,50 @@
                     "metricColumn": "none",
                     "queryType": "randomWalk",
                     "rawQuery": true,
-                    "rawSql": "SELECT\n  number\nFROM my_test_table_2",
+                    "rawSql": "SELECT\n  lime_coefficient\nFROM lime_barchart\nWHERE\n  patient_id = 1234 AND\n  session_id = 5678",
                     "refId": "A",
                     "select": [
                         [
                             {
                                 "params": [
-                                    "number"
+                                    "lime_coefficient"
                                 ],
                                 "type": "column"
                             }
                         ]
                     ],
-                    "table": "my_test_table_2",
-                    "timeColumn": "\"time\"",
-                    "timeColumnType": "timestamp",
-                    "where": []
+                    "table": "lime_barchart",
+                    "timeColumn": "lime_coefficient",
+                    "timeColumnType": "float4",
+                    "where": [
+                        {
+                            "datatype": "int4",
+                            "name": "",
+                            "params": [
+                                "patient_id",
+                                "=",
+                                "1234"
+                            ],
+                            "type": "expression"
+                        },
+                        {
+                            "datatype": "int4",
+                            "name": "",
+                            "params": [
+                                "session_id",
+                                "=",
+                                "5678"
+                            ],
+                            "type": "expression"
+                        }
+                    ]
                 },
                 {
                     "format": "table",
                     "group": [],
                     "metricColumn": "none",
                     "rawQuery": true,
-                    "rawSql": "SELECT\n  letter\nFROM my_test_table_2",
+                    "rawSql": "SELECT\n  feature_name\nFROM lime_barchart\nWHERE\n  patient_id = 1234 AND\n  session_id = 5678",
                     "refId": "B",
                     "select": [
                         [
@@ -132,5 +154,5 @@
     "timezone": "",
     "title": "Plotly panel",
     "uid": "I6mfmZwnk",
-    "version": 3
+    "version": 4
 }
