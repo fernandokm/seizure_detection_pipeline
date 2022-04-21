@@ -26,7 +26,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_DATABASE_GRAFANA}
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}" ]
       interval: 5s
       retries: 5
     restart: always
@@ -34,7 +34,7 @@ services:
   grafana:
     image: grafana/grafana:7.3.4
     container_name: aura-grafana
-    restart : on-failure
+    restart: on-failure
     ports:
       - '${GRAFANA_PORT}:3000'
     volumes:
@@ -52,7 +52,7 @@ services:
       - GF_DATABASE_NAME=${POSTGRES_DATABASE_GRAFANA}
       - GF_DATABASE_USER=${POSTGRES_USER}
       - GF_DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - GF_INSTALL_PLUGINS=ae3e-plotly-panel # v0.4.0
+      - GF_INSTALL_PLUGINS=ae3e-plotly-panel,aidanmountford-html-panel # v0.4.0
       - INFLUXDB_DATABASE=${INFLUXDB_DATABASE}
       - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
       - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
