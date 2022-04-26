@@ -1,4 +1,3 @@
-from cmath import isinf
 import psycopg2
 import csv
 from datetime import datetime
@@ -96,4 +95,27 @@ def get_data_from_csv_dict(csv_files):
 
 if __name__ == "__main__":
 
-    pass
+    import pandas as pd
+
+    shap_data = pd.read_csv("df_grafana_1.csv")[
+        [
+            "shap_values_mean_nni",
+            "mean_nni",
+            "shap_values_sdnn",
+            "sdnn",
+            "lf_hf_ratio",
+            "sdsd",
+            "shap_values_sdsd",
+            "interval_start_time",
+            "shap_values_interval_start_time",
+            "cvi",
+        ]
+    ]
+    shap_data_list = shap_data.to_dict(orient="records")
+    push_postgresql_data(
+        {"shap_data": shap_data_list},
+        "localhost",
+        "grafana",
+        "postgres",
+        "wdkjsdk8hcjbw",
+    )
