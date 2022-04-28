@@ -7,6 +7,8 @@ spdx-license-identifier: gpl-3.0
 import argparse
 import os
 
+PREFIX_TO_REMOVE = ["rr", "feats", "cons"]
+
 
 def convert_args_to_dict(args: argparse.Namespace) -> dict:
     """
@@ -27,16 +29,16 @@ def convert_args_to_dict(args: argparse.Namespace) -> dict:
     """
     args_dict = {
         argument[0]: argument[1]
-        for argument
-        in args._get_kwargs()
-        if argument[1] is not None}
+        for argument in args._get_kwargs()
+        if argument[1] is not None
+    }
 
     return args_dict
 
 
-def generate_output_path(input_file_path: str,
-                         output_folder: str,
-                         format: str) -> str:
+def generate_output_path(
+    input_file_path: str, output_folder: str, format: str, prefix: str = ""
+) -> str:
     """
     Generate an output path.
 
@@ -51,6 +53,8 @@ def generate_output_path(input_file_path: str,
         Path of the output folder
     format: str
         Format of the output file, typically, csv or json
+    prefix : str
+        Prefix to add before the name of output filename
 
     returns
     -------
@@ -58,8 +62,13 @@ def generate_output_path(input_file_path: str,
         Path where to save the output file
     """
     os.makedirs(output_folder, exist_ok=True)
-    output_file_parsing = input_file_path.split('/')[-1].split('.')[0]
-    output_filename = f'{output_file_parsing}.{format}'
+    output_file_parsing = input_file_path.split("/")[-1].split(".")[0]
+    for prefix_to_remove in PREFIX_TO_REMOVE:
+        try:
+            output_file_parsing = output_file_parsing.split(f"{prefix_to_remove}_")[-1]
+        except:
+            pass
+    output_filename = f"{prefix}_{output_file_parsing}.{format}"
     output_file_path = os.path.join(output_folder, output_filename)
 
     return output_file_path
