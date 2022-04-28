@@ -82,8 +82,8 @@ def get_data_from_csv(filepath):
     """
     Transforms data from csv to list of dicts for each line
     """
-    with open(filepath, "r") as csv_file:
-        yield csv.DictReader(csv_file)
+    df = pd.read_csv(filepath)
+    return df.to_dict(orient="records")
 
 
 def get_data_from_csv_dict(csv_files):
