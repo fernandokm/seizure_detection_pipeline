@@ -27,7 +27,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_DATABASE_GRAFANA}
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      test: [ "CMD", "pg_isready", "-U", "${POSTGRES_USER}" ]
       interval: 5s
       retries: 5
     restart: always
@@ -35,7 +35,7 @@ services:
   grafana:
     image: grafana/grafana:7.3.4
     container_name: aura-grafana
-    restart : on-failure
+    restart: on-failure
     ports:
       - '${GRAFANA_PORT}:3000'
     volumes:
