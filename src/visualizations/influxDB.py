@@ -1,27 +1,25 @@
+from src.infrastructure.edf_loader import EdfLoader
+from src.visualizations.log import log
 from typing import Iterator, Any, Union
 
 import csv
 from influxdb_client import InfluxDBClient, WriteOptions
 from pyedflib import EdfReader
 import rx
-import sys
 import datetime
-from math import floor
 from numpy import float64
 
-sys.path.append(".")
-from src.infrastructure.edf_loader import EdfLoader
 
 def push_influxdb_data(
-    data: Any, 
-    host: str = "localhost", 
-    port:int = 8086, 
-    database: str = "default", 
-    retention_policy: str = "autogen", 
-    username: str = "root", 
+    data: Any,
+    host: str = "localhost",
+    port: int = 8086,
+    database: str = "default",
+    retention_policy: str = "autogen",
+    username: str = "root",
     password: str = "root",
     **kwargs
-    ) -> None:
+) -> None:
     """
     Push data to influxdb
     data: client write api record field, can be str, Point, dict, bytes, Observable, NamedTuple, or an iterable of one of these types
@@ -33,6 +31,7 @@ def push_influxdb_data(
         with client.write_api(write_options=WriteOptions(batch_size=50000, flush_interval=10000)) as write_api:
             write_api.write(bucket, record=data)
 
+
 def from_edf(filepath: str, channel: int, mesurement: Union[str, None] = None, tags: dict = {}, field: str = "Field") -> Iterator[str]:
     """
     Get points from edf file
@@ -43,23 +42,28 @@ def from_edf(filepath: str, channel: int, mesurement: Union[str, None] = None, t
     with EdfReader(filepath) as r:
         T_sample_real = 1/r.getSampleFrequency(channel)
         time = r.getStartdatetime()
-        tagslist = ",".join([f"{escape(k)}={escape(v)}" for k, v in tags.items()] + [f"channel={escape(r.getSignalLabels()[channel])}"])
+        tagslist = ",".join([f"{escape(k)}={escape(v)}" for k, v in tags.items(
+        )] + [f"channel={escape(r.getSignalLabels()[channel])}"])
         tagslist = f",{tagslist}" if tagslist else ""
         for val in r.readSignal(channel):
             yield f"{mesurement}{tagslist} {escape(field)}={escapevalue(val)} {to_nanoseconds(time)}"
             # yield Point(f"{mesurement}").tag("channel",f"{channel}").field(f"Tension (uV)", val).time(time)
             time += datetime.timedelta(seconds=T_sample_real)
 
+
 def push_ecg_to_influxdb(ecg_filepath: str, **kwargs) -> None:
     loader = EdfLoader(ecg_filepath)
     channel_label = loader.get_ecg_candidate_channel()
     channel = loader.channels.index(channel_label)
-    data = rx.from_iterable(from_edf(ecg_filepath, channel, mesurement="ecg", tags={"patient": kwargs.get("patient") or ecg_filepath.split("/")[-1].split(".")[0]}, field="Tension (uV)"))
+    data = rx.from_iterable(from_edf(ecg_filepath, channel, mesurement="ecg", tags={"patient": kwargs.get(
+        "patient") or ecg_filepath.split("/")[-1].split(".")[0]}, field="Tension (uV)"))
     push_influxdb_data(data, **kwargs)
+
 
 def escape(s: str) -> str:
     s = str(s)
     return str(s).replace(" ", "\\ ").replace(",", "\\,").replace("=", "\\=")
+
 
 def escapevalue(value: Any) -> str:
     """
@@ -76,9 +80,12 @@ def escapevalue(value: Any) -> str:
         else:
             return ""
 
+
 def push_csv_features_to_influxdb(csv_filepath: str, **kwargs) -> None:
-    data = rx.from_iterable(from_csv(csv_filepath, measurement="features", tags={"patient": kwargs.get("patient") or csv_filepath.split("/")[-1].split(".")[0]}, time_column="timestamp"))
+    data = rx.from_iterable(from_csv(csv_filepath, measurement="features", tags={"patient": kwargs.get(
+        "patient") or csv_filepath.split("/")[-1].split(".")[0]}, time_column="timestamp"))
     push_influxdb_data(data, **kwargs)
+
 
 def from_csv(csv_filepath: str, measurement: Union[None, str] = None, tags: dict = {}, time_column: str = "timestamp", **kwargs) -> Iterator[str]:
     """
@@ -88,7 +95,8 @@ def from_csv(csv_filepath: str, measurement: Union[None, str] = None, tags: dict
     with open(csv_filepath, "r") as f:
         reader = csv.DictReader(f)
         measurement = escape(measurement or csv_filepath)
-        tagslist = ",".join([f"{escape(k)}={escape(v)}" for k, v in tags.items()])
+        tagslist = ",".join(
+            [f"{escape(k)}={escape(v)}" for k, v in tags.items()])
         tagslist = f",{tagslist}" if tagslist else ""
         for row in reader:
             time = row[time_column]
@@ -97,6 +105,7 @@ def from_csv(csv_filepath: str, measurement: Union[None, str] = None, tags: dict
                 if k == time_column or value == "":
                     continue
                 yield f"{measurement}{tagslist} {escape(k)}={value} {to_nanoseconds(time)}"
+
 
 def to_nanoseconds(date_time: Any, mult_to_seconds=1):
     """
@@ -115,3 +124,5 @@ def to_nanoseconds(date_time: Any, mult_to_seconds=1):
     elif type(date_time) == datetime.datetime:
         return int(date_time.timestamp()*1e9)
     raise TypeError("Invalid date_time type: {}".format(type(date_time)))
+
+# TODO : add function to test if patient data already exists

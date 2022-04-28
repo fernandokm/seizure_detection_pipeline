@@ -7,5 +7,6 @@ datasources:
     url: http://influxdb:8086
     database: ${INFLUXDB_DATABASE}
     user: ${INFLUXDB_USERNAME}
-    password: ${INFLUXDB_PASSWORD}
+    secureJsonData:
+      password: ${INFLUXDB_PASSWORD}
     editable: true
