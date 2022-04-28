@@ -24,7 +24,7 @@ CSV_SOURCES = {
     3281: "output/cons_00003281_s001_t001_t001.csv",
     5943: "output/cons_00005943_s001_t000_t000.csv",
 }
-CSV_CRISES = {"crises": "output/crises.csv", "": ""}
+CSV_CRISES = {"crises": "output/crises.csv", "metrics": "output/metrics.csv"}
 
 
 def generate_postgresql_data(csv_files: dict = {}):
@@ -71,5 +71,5 @@ def generate_influxdb_data(edf_files: dict = {}, csv_files: dict = {}):
 if __name__ == "__main__":
     log("Starting execution")
     generate_postgresql_data(CSV_CRISES)
-    # generate_influxdb_data(EDF_SOURCES, CSV_SOURCES)
+    generate_influxdb_data(EDF_SOURCES, CSV_SOURCES)
     log("Execution finished")

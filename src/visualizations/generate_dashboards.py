@@ -1,6 +1,7 @@
 from influxdb_client import InfluxDBClient
 import os
 import json
+from .log import log
 
 IDB_HOST = "localhost"
 IDB_PORT = os.environ.get("INFLUXDB_PORT")
@@ -41,8 +42,6 @@ def generate_home_dashboard(
         patient_ids,
         patient_dashboard_uid=patient_dashboard["uid"],
     )
-    # generate confusion matrix
-    home_dashboard["pannels"][1]["html_data"] = generate_confusion_matrix()
     home_dashboard["panels"][0]["html_data"] = generate_links_pannel(links)
     write_dashboard(home_dashboard, filepath)
 

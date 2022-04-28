@@ -1,170 +1,198 @@
 {
     "annotations": {
-      "list": [
-        {
-          "builtIn": 1,
-          "datasource": "-- Grafana --",
-          "enable": true,
-          "hide": true,
-          "iconColor": "rgba(0, 211, 255, 1)",
-          "name": "Annotations & Alerts",
-          "type": "dashboard"
-        }
-      ]
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": "-- Grafana --",
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
     },
     "editable": true,
     "gnetId": null,
     "graphTooltip": 0,
+    "id": null,
     "links": [],
     "panels": [
-      {
-        "aliasColors": {},
-        "cacheTimeout": null,
-        "css_data": "\nli {\nlist-style-type: none;\npadding: 7px;\nmargin: 3px;\nbackground-color: #f7f8fa;\nborder-radius: 3px;\ncursor: pointer;\n\n}\nli a {\ndisplay: block;\ntext-decoration: none;\ncolor: #464c54;\n}\n\nli:hover {\nbackground-color: #e9edf2;\n}\n\n.session-subtitle {\ncolor: #7b8087;\nfont-size: 10px;\n}",
-        "datasource": null,
-        "doInit": {},
-        "fieldConfig": {
-          "defaults": {
-            "custom": {}
-          },
-          "overrides": []
-        },
-        "format": "short",
-        "gridPos": {
-          "h": 8,
-          "w": 12,
-          "x": 0,
-          "y": 0
-        },
-        "handleMetric": {},
-        "html_data": "\n    <div class=\"panel-container\">\n        <div class=\"panel-content\">\n            <div class=\"panel-content-text\">\n                <div class=\"panel-content-text-row\">\n\n                <ul>\n                    <li><a href='/d/zvyY2SUnk/patient?orgId=1&var-patient=3281&from=1160377339000&to=1160378651996'>Patient 3281<div class='session-subtitle'>x vraies Crises, prédictions justes à x%</div></a></li><li><a href='/d/zvyY2SUnk/patient?orgId=1&var-patient=5943&from=1246179488000&to=1246182286996'>Patient 5943<div class='session-subtitle'>x vraies Crises, prédictions justes à x%</div></a></li>\n                </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n    ",
-        "id": 6,
-        "interval": null,
-        "js_code": "",
-        "js_init_code": "",
-        "links": [],
-        "maxDataPoints": 3,
-        "nullPointMode": "connected",
-        "pluginVersion": "7.3.4",
-        "targets": [
-          {
-            "queryType": "randomWalk",
-            "refId": "A"
-          }
-        ],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Sessions",
-        "type": "aidanmountford-html-panel"
-      },
-      {
-        "datasource": null,
-        "fieldConfig": {
-          "defaults": {
-            "custom": {},
-            "displayName": "f1-score",
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
+        {
+            "aliasColors": {},
+            "cacheTimeout": null,
+            "css_data": "\nli {\nlist-style-type: none;\npadding: 7px;\nmargin: 3px;\nbackground-color: #f7f8fa;\nborder-radius: 3px;\ncursor: pointer;\n\n}\nli a {\ndisplay: block;\ntext-decoration: none;\ncolor: #464c54;\n}\n\nli:hover {\nbackground-color: #e9edf2;\n}\n\n.session-subtitle {\ncolor: #7b8087;\nfont-size: 10px;\n}",
+            "datasource": null,
+            "doInit": {},
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
                 },
+                "overrides": []
+            },
+            "format": "short",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 0
+            },
+            "handleMetric": {},
+            "html_data": "\n    <div class=\"panel-container\">\n        <div class=\"panel-content\">\n            <div class=\"panel-content-text\">\n                <div class=\"panel-content-text-row\">\n\n                <ul>\n                    <li><a href='/d/zvyY2SUnk/patient?orgId=1&var-patient=3281&from=1160377339000&to=1160378651996'>Patient 3281<div class='session-subtitle'>x vraies Crises, pr\u00e9dictions justes \u00e0 x%</div></a></li><li><a href='/d/zvyY2SUnk/patient?orgId=1&var-patient=5943&from=1246179488000&to=1246182286996'>Patient 5943<div class='session-subtitle'>x vraies Crises, pr\u00e9dictions justes \u00e0 x%</div></a></li>\n                </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n    ",
+            "id": 6,
+            "interval": null,
+            "js_code": "",
+            "js_init_code": "",
+            "links": [],
+            "maxDataPoints": 3,
+            "nullPointMode": "connected",
+            "pluginVersion": "7.3.4",
+            "targets": [
                 {
-                  "color": "red",
-                  "value": 80
+                    "queryType": "randomWalk",
+                    "refId": "A"
                 }
-              ]
-            }
-          },
-          "overrides": []
-        },
-        "gridPos": {
-          "h": 7,
-          "w": 5,
-          "x": 12,
-          "y": 0
-        },
-        "id": 4,
-        "options": {
-          "orientation": "auto",
-          "reduceOptions": {
-            "calcs": [
-              "mean"
             ],
-            "fields": "",
-            "values": false
-          },
-          "showThresholdLabels": false,
-          "showThresholdMarkers": true
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Sessions",
+            "type": "aidanmountford-html-panel"
         },
-        "pluginVersion": "7.3.4",
-        "targets": [
-          {
-            "queryType": "randomWalk",
-            "refId": "A"
-          }
-        ],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Model performance",
-        "type": "gauge"
-      },
-      {
-        "aliasColors": {},
-        "cacheTimeout": null,
-        "css_data": "",
-        "datasource": null,
-        "doInit": {},
-        "fieldConfig": {
-          "defaults": {
-            "custom": {}
-          },
-          "overrides": []
+        {
+            "datasource": "Postgres",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {},
+                    "displayName": "Specificity",
+                    "mappings": [],
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "blue",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 80
+                            }
+                        ]
+                    }
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 7,
+                "w": 5,
+                "x": 12,
+                "y": 0
+            },
+            "id": 4,
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "mean"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "pluginVersion": "7.3.4",
+            "targets": [
+                {
+                    "format": "time_series",
+                    "group": [],
+                    "metricColumn": "none",
+                    "queryType": "randomWalk",
+                    "rawQuery": false,
+                    "rawSql": "SELECT\n  value\nFROM metrics\nWHERE\n metric='specificity' \nORDER BY 1",
+                    "refId": "A",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "value"
+                                ],
+                                "type": "column"
+                            }
+                        ]
+                    ],
+                    "table": "metrics",
+                    "timeColumn": "value",
+                    "timeColumnType": "float8",
+                    "where": [
+                        {
+                            "name": "$__unixEpochFilter",
+                            "params": [],
+                            "type": "macro"
+                        }
+                    ]
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Model performance",
+            "type": "stat"
         },
-        "format": "short",
-        "gridPos": {
-          "h": 6,
-          "w": 5,
-          "x": 17,
-          "y": 0
-        },
-        "handleMetric": {},
-        "html_data": "",
-        "id": 8,
-        "interval": null,
-        "js_code": "",
-        "js_init_code": "",
-        "links": [],
-        "maxDataPoints": 3,
-        "nullPointMode": "connected",
-        "pluginVersion": "7.3.4",
-        "targets": [
-          {
-            "queryType": "randomWalk",
-            "refId": "A"
-          }
-        ],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Panel Title",
-        "type": "aidanmountford-html-panel"
-      }
+        {
+            "aliasColors": {},
+            "cacheTimeout": null,
+            "css_data": "",
+            "datasource": null,
+            "doInit": {},
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "format": "short",
+            "gridPos": {
+                "h": 6,
+                "w": 5,
+                "x": 17,
+                "y": 0
+            },
+            "handleMetric": {},
+            "html_data": "",
+            "id": 8,
+            "interval": null,
+            "js_code": "",
+            "js_init_code": "",
+            "links": [],
+            "maxDataPoints": 3,
+            "nullPointMode": "connected",
+            "pluginVersion": "7.3.4",
+            "targets": [
+                {
+                    "queryType": "randomWalk",
+                    "refId": "A"
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Panel Title",
+            "type": "aidanmountford-html-panel"
+        }
     ],
     "schemaVersion": 26,
     "style": "dark",
     "tags": [],
     "templating": {
-      "list": []
+        "list": []
     },
     "time": {
-      "from": "now-6h",
-      "to": "now"
+        "from": "now-6h",
+        "to": "now"
     },
     "timepicker": {},
     "timezone": "",
     "title": "Home",
     "uid": "y5AoxS8nz",
     "version": 18
-  }
+}
