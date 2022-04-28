@@ -102,6 +102,7 @@ def push_postgresql_data_from_pd_dataframe(
     database: str,
     username: str,
     password: str,
+    table_name: str,
     port: int = 5432,
 ):
     """
@@ -111,7 +112,7 @@ def push_postgresql_data_from_pd_dataframe(
     }
     """
     data = df.to_dict(orient="records")
-    push_postgresql_data(data, host, database, username, password, port)
+    push_postgresql_data({table_name: data}, host, database, username, password, port)
 
 
 if __name__ == "__main__":
