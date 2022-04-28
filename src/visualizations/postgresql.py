@@ -3,6 +3,8 @@ import csv
 from datetime import datetime
 import pandas as pd
 
+from typing import Generator
+
 
 def push_postgresql_data(
     data: dict, host: str, database: str, username: str, password: str, port: int = 5432
@@ -81,7 +83,7 @@ def get_data_from_csv(filepath):
     Transforms data from csv to list of dicts for each line
     """
     with open(filepath, "r") as csv_file:
-        return csv.DictReader(csv_file)
+        yield csv.DictReader(csv_file)
 
 
 def get_data_from_csv_dict(csv_files):
