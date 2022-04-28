@@ -57,8 +57,8 @@
                     "xaxis": {
                         "autorange": true,
                         "range": [
-                            -10668.495297805668,
-                            2944668.495297806
+                            -13638.599810785236,
+                            2947638.599810785
                         ],
                         "type": "linear"
                     }
@@ -143,7 +143,7 @@
                     "showlegend": false
                 },
                 "onclick": "console.log(data)\nwindow.updateVariables({query:{'var-project':'test'}, partial: true})",
-                "script": "console.log(data)\nvar x = data.series[0].fields[0].values.buffer;\nvar y = data.series[1].fields[0].values.buffer;\nvar x_pos = [];\nvar x_neg = [];\nvar y_pos = [];\nvar y_neg = [];\nfor (var i = 0; i < x.length; i++) {\n  if (x[i] > 0) {\n    x_pos.push(x[i]);\n    y_pos.push(y[i]);\n  } else {\n    x_neg.push(x[i]);\n    y_neg.push(y[i]);\n  };\n};\nconsole.log(x_pos, x_neg)\n\nvar trace_pos = {\n  x: x_pos,\n  y: y_pos,\n  type:\"bar\",\n  orientation: \"h\",\n  marker:{\n    color:\"#23c43e\"\n  }\n};\nvar trace_neg = {\n  x: x_neg,\n  y: y_neg,\n  type:\"bar\",\n  orientation: \"h\",\n  marker:{\n    color:\"#eb4034\"\n  }\n};\n\n\nreturn {data:[trace_pos, trace_neg]};\n"
+                "script": "console.log(data)\nvar x = data.series[0].fields[0].values.buffer;\nvar y = data.series[1].fields[0].values.buffer;\nvar colors = [];\n\nfor (var i = 0; i < x.length; i++) {\n  if (x[i] > 0) {\n    colors.push(\"#23c43e\");\n  } else {\n    colors.push(\"#eb4034\");\n  };\n};\n\nvar trace = {\n  x: x,\n  y: y,\n  type:\"bar\",\n  orientation: \"h\",\n  marker:{\n    color:colors\n  }\n};\n\nreturn {data:[trace]};\n"
             },
             "pluginVersion": "7.3.4",
             "targets": [
