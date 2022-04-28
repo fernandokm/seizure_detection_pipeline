@@ -1,8 +1,13 @@
-# grafana/provisioning/dashboards/dashboard.yml
 apiVersion: 1
- 
+
 providers:
-  - name: 'Default'
+  - name: dashboards
+    orgId: 
     folder: ''
+    type: file
+    disableDetection: false
+    updateIntervalSeconds: 10
+    editable: true
+    allowUpdates: true
     options:
-      path: /etc/grafana/provisioning/dashboards
+      path: '/etc/grafana/provisioning'
