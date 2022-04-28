@@ -1,0 +1,244 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": "-- Grafana --",
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 0,
+    "links": [],
+    "panels": [
+        {
+            "datasource": "Postgres",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 14,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "id": 4,
+            "options": {
+                "config": null,
+                "data": [
+                    {
+                        "line": {
+                            "color": "red",
+                            "width": 2
+                        },
+                        "mode": "markers",
+                        "type": "scatter"
+                    }
+                ],
+                "layout": {
+                    "font": {
+                        "color": "darkgrey"
+                    },
+                    "margin": {
+                        "b": 20,
+                        "t": 30
+                    },
+                    "paper_bgcolor": "rgba(0,0,0,0)",
+                    "plot_bgcolor": "rgba(0,0,0,0)",
+                    "xaxis": {
+                        "autorange": true,
+                        "range": [
+                            -13638.599810785236,
+                            2947638.599810785
+                        ],
+                        "type": "linear"
+                    }
+                },
+                "onclick": "console.log(data)\nwindow.updateVariables({query:{'var-project':'test'}, partial: true})",
+                "script": "console.log(data)\nvar x = data.series[0].fields[0].values.buffer;\nvar y = data.series[0].fields[1].values.buffer;\nvar z = data.series[0].fields[2].values.buffer;\nvar colors = [];\n\nvar sorted_z = [...z].sort((a, b) => a - b)\nfirst_decile = Math.floor(sorted_z.length*0.05) - 1;\nlast_decile = Math.floor(sorted_z.length*0.95) - 1;;\n\n\nvar z_max = sorted_z[last_decile];\nvar z_min = sorted_z[first_decile];\n//var z_min = 0;\n//var z_max = 31;\nvar z_range = z_max - z_min;\n\nvar available_colors = [\"#007bff\", \"#0069f8\", \"#5153e9\", \"#7e35d6\", \"#9d00be\", \"#bc00ab\", \"#db009a\", \"#f30086\", \"#ff0071\", \"#ff0059\"];\n\nfor (var i = 0; i < z.length; i++) {\n  if (z_min > z[i]) {\n    colors.push(available_colors[0]);\n  };\n  for (var j = 0; j < available_colors.length; j++) {\n    if (j * (z_max - z_min)/available_colors.length + z_min <= z[i] && (j+1) * (z_max - z_min)/available_colors.length + z_min > z[i]) {\n      colors.push(available_colors[j]);\n      break;\n    };\n  };\n  if (z_max <= z[i]) {\n    colors.push(available_colors[available_colors.length - 1]);\n  };\n};\n\nvar trace = {\n  x: x,\n  y: y,\n  marker: {\n    color: colors,\n    colorscale : [[0, \"#007bff\"], [0.1, \"#0069f8\"], [0.2, \"#5153e9\"], [0.3, \"#7e35d6\"], [0.4,\"#9d00be\"], [0.5, \"#bc00ab\"], [0.6, \"#db009a\"], [0.7, \"#f30086\"], [0.8, \"#ff0071\"], [1,\"#ff0059\"]],\n    showscale : true,\n    cmin : z_min,\n    cmax : z_max,\n    }\n};\n\nconsole.log(z_max, z_min)\nconsole.log(trace)\nreturn {data:[trace]};"
+            },
+            "pluginVersion": "7.3.4",
+            "targets": [
+                {
+                    "format": "table",
+                    "group": [],
+                    "metricColumn": "none",
+                    "queryType": "randomWalk",
+                    "rawQuery": true,
+                    "rawSql": "SELECT\n  interval_start_time,\n  shap_values_interval_start_time,\n  cvi\nFROM shap_data",
+                    "refId": "A",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "number"
+                                ],
+                                "type": "column"
+                            }
+                        ]
+                    ],
+                    "table": "my_test_table_2",
+                    "timeColumn": "number",
+                    "timeColumnType": "float4",
+                    "where": [
+                        {
+                            "name": "$__unixEpochFilter",
+                            "params": [],
+                            "type": "macro"
+                        }
+                    ]
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Panel Title",
+            "type": "ae3e-plotly-panel"
+        },
+        {
+            "datasource": "Postgres",
+            "fieldConfig": {
+                "defaults": {
+                    "custom": {}
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 9,
+                "w": 24,
+                "x": 0,
+                "y": 14
+            },
+            "id": 2,
+            "options": {
+                "config": {
+                    "displayModeBar": false
+                },
+                "data": [
+                    {
+                        "hoverinfo": "",
+                        "orientation": "h",
+                        "type": "bar"
+                    }
+                ],
+                "layout": {
+                    "font": {
+                        "color": "darkgrey"
+                    },
+                    "margin": {
+                        "b": 20,
+                        "l": 170,
+                        "t": 30
+                    },
+                    "paper_bgcolor": "rgba(0,0,0,0)",
+                    "plot_bgcolor": "rgba(0,0,0,0)",
+                    "showlegend": false
+                },
+                "onclick": "console.log(data)\nwindow.updateVariables({query:{'var-project':'test'}, partial: true})",
+                "script": "console.log(data)\nvar x = data.series[0].fields[0].values.buffer;\nvar y = data.series[1].fields[0].values.buffer;\nvar colors = [];\n\nfor (var i = 0; i < x.length; i++) {\n  if (x[i] > 0) {\n    colors.push(\"#23c43e\");\n  } else {\n    colors.push(\"#eb4034\");\n  };\n};\n\nvar trace = {\n  x: x,\n  y: y,\n  type:\"bar\",\n  orientation: \"h\",\n  marker:{\n    color:colors\n  }\n};\n\nreturn {data:[trace]};\n"
+            },
+            "pluginVersion": "7.3.4",
+            "targets": [
+                {
+                    "format": "table",
+                    "group": [],
+                    "metricColumn": "none",
+                    "queryType": "randomWalk",
+                    "rawQuery": true,
+                    "rawSql": "SELECT\n  lime_coefficient\nFROM lime_barchart\nWHERE\n  patient_id = 1234 AND\n  session_id = 5678",
+                    "refId": "A",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "lime_coefficient"
+                                ],
+                                "type": "column"
+                            }
+                        ]
+                    ],
+                    "table": "lime_barchart",
+                    "timeColumn": "lime_coefficient",
+                    "timeColumnType": "float4",
+                    "where": [
+                        {
+                            "datatype": "int4",
+                            "name": "",
+                            "params": [
+                                "patient_id",
+                                "=",
+                                "1234"
+                            ],
+                            "type": "expression"
+                        },
+                        {
+                            "datatype": "int4",
+                            "name": "",
+                            "params": [
+                                "session_id",
+                                "=",
+                                "5678"
+                            ],
+                            "type": "expression"
+                        }
+                    ]
+                },
+                {
+                    "format": "table",
+                    "group": [],
+                    "metricColumn": "none",
+                    "rawQuery": true,
+                    "rawSql": "SELECT\n  feature_name\nFROM lime_barchart\nWHERE\n  patient_id = 1234 AND\n  session_id = 5678",
+                    "refId": "B",
+                    "select": [
+                        [
+                            {
+                                "params": [
+                                    "value_double"
+                                ],
+                                "type": "column"
+                            }
+                        ]
+                    ],
+                    "table": "test_data",
+                    "timeColumn": "time_date_time",
+                    "timeColumnType": "timestamp",
+                    "where": [
+                        {
+                            "name": "$__timeFilter",
+                            "params": [],
+                            "type": "macro"
+                        }
+                    ]
+                }
+            ],
+            "timeFrom": null,
+            "timeShift": null,
+            "title": "Panel Title",
+            "type": "ae3e-plotly-panel"
+        }
+    ],
+    "schemaVersion": 26,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-6h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Plotly panel",
+    "uid": "I6mfmZwnk",
+    "version": 1
+}
