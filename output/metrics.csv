@@ -1,0 +1,7 @@
+metric,value
+tp,96.0
+fp,1067.0
+tn,158896.0
+fn,14346.0
+sensitivity,0.006647278770253427
+specificity,0.9933297074948582
