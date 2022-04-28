@@ -43,7 +43,7 @@ def lime_explainer_to_pd_dataframe(
 
 if __name__ == "__main__":
 
-    from src.initialization.postgresql import push_postgresql_data
+    from src.visualizations.postgresql import push_postgresql_data_from_pd_dataframe
 
     exemple_exp_as_list = [
         ("sdnn > 45.06", 0.02411322827453069),
@@ -66,8 +66,10 @@ if __name__ == "__main__":
     patient_id = 1234
     session_id = 5678
 
-    data = lime_explainer_to_pd_dataframe(exp, timestamp, patient_id, session_id)
+    df = lime_explainer_to_pd_dataframe(exp, timestamp, patient_id, session_id)
 
-    print(data)
+    print(df)
 
-    push_postgresql_data(data, "localhost", "grafana", "postgres", "wdkjsdk8hcjbw")
+    push_postgresql_data_from_pd_dataframe(
+        df, "localhost", "grafana", "postgres", "wdkjsdk8hcjbw", "lime_barchart"
+    )
