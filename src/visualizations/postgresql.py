@@ -1,5 +1,7 @@
 import psycopg2
 import csv
+from datetime import datetime
+import pandas as pd
 
 from typing import Generator
 
@@ -36,69 +38,52 @@ def generate_table(cursor, table, content):
     content: table content
     """
     cursor.execute(f"DROP TABLE IF EXISTS {table}")
-    file = content if type(content) == dict else next(content)  # if generator, get file
-    first_row: dict = next(file)
-    columns_sql = ", ".join(
-        (f"{column} {get_data_type(value)}" for column, value in first_row.items())
-    )
+    first_row: list = content[0]
+
+    def type_maping(item):
+        column, value = item
+        if type(value) == str:
+            return f"{column} varchar(255)"
+        elif isinstance(value, datetime):
+            return f"{column} timestamp"
+        elif isinstance(value, float):
+            return f"{column} double"
+        else:
+            return f"{column} integer"
+
+    columns_sql = ", ".join((map(type_maping, first_row.items())))
     cursor.execute(f"CREATE TABLE {table} ({columns_sql})")
-    fill_table(cursor, table, file, first_row=first_row)
+    fill_table(cursor, table, content)
 
 
-def get_data_type(data):
-    """
-    Returns data type of data
-    """
-    association = [
-        (int, "integer"),
-        (float, "float"),
-        (bool, "boolean"),
-        (str, "varchar(255)"),
-    ]
-    for dt_type, dt_name in association:
-        if _check_type(data, dt_type):
-            return dt_name
-
-
-def _check_type(data, dt_type):
-    """
-    Check if data is of type
-    """
-    if dt_type == bool:
-        try:
-            return str(data).lower() in ["true", "false"]
-        except:
-            return False
-    try:
-        dt_type(data)
-        return True
-    except:
-        return False
-
-
-def fill_table(cursor, table, content, first_row=None):
+def fill_table(cursor, table, content):
     """
     Fills existing table in postgresql with content
     cursor: cursor
     table: table name
     content: table content
     """
-    if first_row:
-        columns = ", ".join(first_row.keys())
-        values = ", ".join(map(lambda column: f"%({column})s", first_row.keys()))
-        cursor.execute(f"INSERT INTO {table} ({columns}) VALUES ({values})", first_row)
     for row in content:
-        columns = ", ".join(row.keys())
-        values = ", ".join(map(lambda column: f"%({column})s", row.keys()))
-        cursor.execute(f"INSERT INTO {table} ({columns}) VALUES ({values})", row)
+        columns_sql = ", ".join((map(lambda column: f"{column}", row.keys())))
+        values_sql = ", ".join(
+            (
+                map(
+                    lambda column: f"'{row[column]}'"
+                    if type(row[column] == "str")
+                    else f"{row[column]}",
+                    row.keys(),
+                )
+            )
+        )
+        cursor.execute(f"INSERT INTO {table} ({columns_sql}) VALUES ({values_sql})")
 
 
 def get_data_from_csv(filepath):
     """
     Transforms data from csv to list of dicts for each line
     """
-    with open(filepath, "r") as csv_file:
-        yield csv.DictReader(csv_file)
+    df = pd.read_csv(filepath)
+    return df.to_dict(orient="records")
 
 
 def get_data_from_csv_dict(csv_files):
@@ -109,3 +94,50 @@ def get_data_from_csv_dict(csv_files):
     for table, filepath in csv_files.items():
         data[table] = get_data_from_csv(filepath)
     return data
+
+
+def push_postgresql_data_from_pd_dataframe(
+    df: pd.DataFrame,
+    host: str,
+    database: str,
+    username: str,
+    password: str,
+    table_name: str,
+    port: int = 5432,
+):
+    """
+    Push data to postgresql
+    df: input data {
+        table_name: [{column1: value1, column2: value2}, {column1: value1, column2: value2},...]
+    }
+    """
+    data = df.to_dict(orient="records")
+    push_postgresql_data({table_name: data}, host, database, username, password, port)
+
+
+if __name__ == "__main__":
+
+    import pandas as pd
+
+    shap_data = pd.read_csv("df_grafana_1.csv")[
+        [
+            "shap_values_mean_nni",
+            "mean_nni",
+            "shap_values_sdnn",
+            "sdnn",
+            "lf_hf_ratio",
+            "sdsd",
+            "shap_values_sdsd",
+            "interval_start_time",
+            "shap_values_interval_start_time",
+            "cvi",
+        ]
+    ]
+    shap_data_list = shap_data.to_dict(orient="records")
+    push_postgresql_data(
+        {"shap_data": shap_data_list},
+        "localhost",
+        "grafana",
+        "postgres",
+        "wdkjsdk8hcjbw",
+    )
