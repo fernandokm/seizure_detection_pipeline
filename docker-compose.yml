@@ -8,6 +8,7 @@ services:
       - '${INFLUXDB_PORT}:8086'
     volumes:
       - influxdb-storage:/var/lib/influxdb
+      - ./influxdb/:/etc/influxdb/
     environment:
       - INFLUXDB_DB=${INFLUXDB_DATABASE}
       - INFLUXDB_ADMIN_USER=${INFLUXDB_USERNAME}
