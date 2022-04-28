@@ -1,16 +1,10 @@
 from typing import Callable, List
 from datetime import datetime
-import pandas as pd
 import logging
 
 from airflow.decorators import dag, task
 import sys
 sys.path.append('.')
-from src.usecase.detect_qrs import detect_qrs
-from src.usecase.compute_hrvanalysis_features import \
-    compute_hrvanalysis_features
-from src.usecase.consolidate_feats_and_annot import \
-    consolidate_feats_and_annot, WINDOW_INTERVAL
 
 # from src.usecase.create_ml_dataset import ML_DATASET_OUTPUT_FOLDER, create_ml_dataset
 # from src.usecase.apply_ecg_qc import apply_ecg_qc
@@ -84,6 +78,8 @@ def dag_seizure_detection_pipeline():
 
     @task()
     def t_detect_qrs(parameters_list: List[dict]) -> List[dict]:
+        from src.usecase.detect_qrs import detect_qrs
+
         def inner(parameters: dict):
             output_qrs_file_path, sampling_frequency = detect_qrs(
                 qrs_file_path=parameters['qrs_file_path'],
@@ -112,6 +108,8 @@ def dag_seizure_detection_pipeline():
 
     @task()
     def t_compute_hrv_analysis_features(parameters_list: List[dict]) -> List[dict]:
+        from src.usecase.compute_hrvanalysis_features import compute_hrvanalysis_features
+
         def inner(parameters: dict) -> dict:
             output_features_file_path = compute_hrvanalysis_features(
                 rr_intervals_file_path=parameters['rr_file_path'],
@@ -130,6 +128,8 @@ def dag_seizure_detection_pipeline():
 
     @task()
     def t_compute_consolidate_feats_and_annot(parameters_list: List[dict]) -> List[dict]:
+        from src.usecase.consolidate_feats_and_annot import consolidate_feats_and_annot, WINDOW_INTERVAL
+
         def inner(parameters: dict) -> dict:
             output_cons_file_path = consolidate_feats_and_annot(
                 features_file_path=parameters['features_file_path'],
@@ -193,7 +193,15 @@ def dag_seizure_detection_pipeline():
 #    )
 
     @task()
-    def t_get_initial_parameters(df_db: pd.DataFrame) -> List[dict]:
+    def t_get_initial_parameters(partition_index: int) -> List[dict]:
+        import pandas as pd
+        # Split the df_db into blocks df_db[0:partition_size], df_db[partition_size:2*partition_size], ...
+        df_db = pd.read_csv(f'{FETCHED_DATA_FOLDER}/df_candidates.csv', encoding='utf-8')
+        partition_size = (df_db.shape[0] + NUM_PARTITIONS - 1) // NUM_PARTITIONS
+        partition_start = partition_index * partition_size
+        partition_end = (partition_index+1) * partition_size
+        df_db = df_db.iloc[partition_start:partition_end]
+
         parameters_list = []
         for index in range(df_db.shape[0]):
             qrs_file_path = df_db['edf_file_path'].iloc[index]
@@ -211,13 +219,8 @@ def dag_seizure_detection_pipeline():
             parameters_list.append(parameters)
         return parameters_list
 
-    df_db = pd.read_csv(f'{FETCHED_DATA_FOLDER}/df_candidates.csv', encoding='utf-8')
-    partition_size = (df_db.shape[0] + NUM_PARTITIONS - 1) // NUM_PARTITIONS
     for partition_index in range(NUM_PARTITIONS):
-        # Split the df_db into blocks df_db[0:partition_size], df_db[partition_size:2*partition_size], ...
-        partition_start = partition_index * partition_size
-        partition_end = (partition_index+1) * partition_size
-        parameters_list = t_get_initial_parameters(df_db.iloc[partition_start:partition_end])
+        parameters_list = t_get_initial_parameters(partition_index)
 
         qrs_parameters_list = t_detect_qrs(parameters_list)
         parameters_list = t_consolidate_parameters(parameters_list,
