@@ -1,6 +1,7 @@
 import psycopg2
 import csv
 from datetime import datetime
+import pandas as pd
 
 
 def push_postgresql_data(
@@ -91,6 +92,24 @@ def get_data_from_csv_dict(csv_files):
     for table, filepath in csv_files.items():
         data[table] = get_data_from_csv(filepath)
     return data
+
+
+def push_postgresql_data_from_pd_dataframe(
+    df: pd.DataFrame,
+    host: str,
+    database: str,
+    username: str,
+    password: str,
+    port: int = 5432,
+):
+    """
+    Push data to postgresql
+    df: input data {
+        table_name: [{column1: value1, column2: value2}, {column1: value1, column2: value2},...]
+    }
+    """
+    data = df.to_dict(orient="records")
+    push_postgresql_data(data, host, database, username, password, port)
 
 
 if __name__ == "__main__":
