@@ -84,9 +84,6 @@ ipython_config.py
 # pyenv
 .python-version
 
-# vs code
-.vscode
-
 # pipenv
 #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
 #   However, in case of collaboration, if having platform-specific dependencies or dependencies
@@ -132,4 +129,13 @@ dmypy.json
 .pyre/
 
 # Files
-*.csv
+# vscode
+.vscode
+
+# Addition locations
+output/db/*csv
+cloud/
+tests/output/
+exports/
+output/*/*
+data/data_pl
