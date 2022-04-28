@@ -2,14 +2,14 @@ from datetime import datetime
 import lime
 from lime import lime_tabular
 from typing import Dict, List, Union
+import pandas as pd
 
 
-def lime_barchart_to_postgresql_data(
+def lime_explainer_to_pd_dataframe(
     exp: lime.explanation.Explanation,
     timestamp: str,
     patient_id: int,
     session_id: int,
-    table_name: str = "lime_barchart",
 ) -> Dict[str, List[Dict[str, Union[datetime.timestamp, int, float, str]]]]:
     """
     Converts a lime barchart to a dictionnary uploadable as postgresql data
@@ -32,45 +32,11 @@ def lime_barchart_to_postgresql_data(
     Dict[str, List[Dict[str, Union[datetime.timestamp, int, float, str]]]]
         a dictionnary respecting the postgresql data format
     """
-    data = {table_name: []}
-    for (feature_name, lime_coefficient) in exp.as_list():
-        data[table_name].append(
-            {
-                "timestamp": datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f"),
-                "patient_id": patient_id,
-                "session_id": session_id,
-                "feature_name": feature_name,
-                "lime_coefficient": lime_coefficient,
-            }
-        )
-    return data
-
-
-def merge_postgresql_data(data_to_merge_on, data_to_merge):
-    """
-    Merges two dictionnary respecting the postgresql data format into one.
-    If a table in data_to_merge is not in data_to_merge_on, then it is added to it
-    Else, if the table already exists, they are concatenated.
-    data_to_merge_on will be modified in place and returned as the result
-
-    Parameters
-    ----------
-    data_to_merge_on : Dict[str, List[Dict[str, Union[datetime.timestamp, int, float, str]]]]
-        a dictionnary respecting the postgresql data format
-    data_to_merge : Dict[str, List[Dict[str, Union[datetime.timestamp, int, float, str]]]]
-        an other dictionnary respecting the postgresql data format
-
-    Returns
-    -------
-    Dict[str, List[Dict[str, Union[datetime.timestamp, int, float, str]]]]
-        a dictionnary resulting of the merging of the two arguments
-    """
-    for table_name in data_to_merge_on:
-        if table_name in data_to_merge:
-            data_to_merge_on[table_name].append(data_to_merge[table_name])
-        else:
-            data_to_merge_on[table_name] = data_to_merge[table_name]
-    return data_to_merge_on
+    df = pd.DataFrame(exp.as_list(), columns=["feature_name", "lime_coefficient"])
+    df["timestamp"] = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f")
+    df["patient_id"] = patient_id
+    df["session_id"] = session_id
+    return df
 
 
 # pd.DataFrame : 1 column par feature, 1 column shap value par feature, timestamp (str)
@@ -100,7 +66,7 @@ if __name__ == "__main__":
     patient_id = 1234
     session_id = 5678
 
-    data = lime_barchart_to_postgresql_data(exp, timestamp, patient_id, session_id)
+    data = lime_explainer_to_pd_dataframe(exp, timestamp, patient_id, session_id)
 
     print(data)
 
