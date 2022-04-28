@@ -8,6 +8,7 @@ services:
       - '${INFLUXDB_PORT}:8086'
     volumes:
       - influxdb-storage:/var/lib/influxdb
+      - ./influxdb/:/etc/influxdb/
     environment:
       - INFLUXDB_DB=${INFLUXDB_DATABASE}
       - INFLUXDB_ADMIN_USER=${INFLUXDB_USERNAME}
@@ -50,9 +51,13 @@ services:
       - GF_DATABASE_TYPE=postgres
       - GF_DATABASE_HOST=postgres:5432
       - GF_DATABASE_NAME=${POSTGRES_DATABASE_GRAFANA}
+      - POSTGRESQL_DB=${POSTGRES_DATABASE}
       - GF_DATABASE_USER=${POSTGRES_USER}
       - GF_DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - GF_INSTALL_PLUGINS=ae3e-plotly-panel # v0.4.0
+      - GF_INSTALL_PLUGINS=ae3e-plotly-panel,aidanmountford-html-panel # v0.4.0
+      - INFLUXDB_DATABASE=${INFLUXDB_DATABASE}
+      - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
+      - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
 
 volumes:
   influxdb-storage:
