@@ -23,6 +23,8 @@ FETCHED_DATA_FOLDER = '/'.join([OUTPUT_FOLDER, 'fetched_data'])
 RR_INTERVALS_FOLDER = '/'.join([OUTPUT_FOLDER, 'res-v0_6'])
 FEATURES_FOLDER = '/'.join([OUTPUT_FOLDER, 'feats-v0_6'])
 CONSOLIDATED_FOLDER = '/'.join([OUTPUT_FOLDER, 'cons-v0_6'])
+PREDICTIONS_FOLDER = '/'.join([OUTPUT_FOLDER, 'preds-v0_6'])
+CRISES_FOLDER = '/'.join([OUTPUT_FOLDER, 'crises-v0_6'])
 # DICT_PARAMS_EDF_FILE = {
 #     "patient": "PAT_6",
 #     "record": "77",
@@ -49,6 +51,7 @@ NUM_PARTITIONS = 8
 SEGMENT_SIZE_TRESHOLD = 0.9
 
 AIRFLOW_PREFIX_TO_DATA = '/opt/airflow/'
+
 
 def map_parameters(fn: Callable, parameters_list: list) -> list:
     """Similar to `list(map(fn, parameters))`, but with error checking and logging.
@@ -88,7 +91,7 @@ def dag_seizure_detection_pipeline():
                 output_folder=parameters['rr_intervals_folder'])
 
             output_parameters = {'rr_file_path': output_qrs_file_path,
-                                'sampling_frequency': sampling_frequency}
+                                 'sampling_frequency': sampling_frequency}
 
             return output_parameters
 
@@ -209,13 +212,13 @@ def dag_seizure_detection_pipeline():
             exam_id = df_db['exam_id'].iloc[index]
             parameters = {'qrs_file_path': ''.join([AIRFLOW_PREFIX_TO_DATA,
                                                     qrs_file_path]),
-                            'annotations_file_path': ''.join([AIRFLOW_PREFIX_TO_DATA,
+                          'annotations_file_path': ''.join([AIRFLOW_PREFIX_TO_DATA,
                                                             tse_bi_file_path]),
-                            'exam_id': exam_id,
-                            'method': DETECT_QRS_METHOD,
-                            'rr_intervals_folder': RR_INTERVALS_FOLDER,
-                            'features_folder': FEATURES_FOLDER,
-                            'consolidated_folder': CONSOLIDATED_FOLDER}
+                          'exam_id': exam_id,
+                          'method': DETECT_QRS_METHOD,
+                          'rr_intervals_folder': RR_INTERVALS_FOLDER,
+                          'features_folder': FEATURES_FOLDER,
+                          'consolidated_folder': CONSOLIDATED_FOLDER}
             parameters_list.append(parameters)
         return parameters_list
 
@@ -252,4 +255,80 @@ def dag_seizure_detection_pipeline():
         # t_ecg_qc_statistical_analysis(chunk_file=file_quality)
 
 
+@dag(default_args=DEFAULT_ARGS,
+     dag_id='model_pipeline',
+     description='Start the whole seizure detection pipeline',
+     start_date=START_DATE,
+     schedule_interval=SCHEDULE_INTERVAL,
+     concurrency=CONCURRENCY)
+def dag_model_pipeline():
+    @task()
+    def t_get_initial_parameters(partition_index: int) -> List[dict]:
+        import pandas as pd
+        import os
+        from os import path
+        # Split the df_db into blocks df_db[0:partition_size], df_db[partition_size:2*partition_size], ...
+        df_db = pd.read_csv(f'{FETCHED_DATA_FOLDER}/df_candidates.csv', encoding='utf-8')
+        partition_size = (df_db.shape[0] + NUM_PARTITIONS - 1) // NUM_PARTITIONS
+        partition_start = partition_index * partition_size
+        partition_end = (partition_index+1) * partition_size
+        df_db = df_db.iloc[partition_start:partition_end]
+
+        cons_files = os.listdir(CONSOLIDATED_FOLDER)
+        parameters_list = []
+        for index in range(df_db.shape[0]):
+            qrs_file_path = df_db['edf_file_path'].iloc[index]
+            session, _ = path.splitext(path.basename(qrs_file_path))
+
+            matches = [f for f in cons_files if session in f]
+            if matches:
+                cons_file_path = matches[0]
+                print('Found cons file', cons_file_path)
+            else:
+                print('No cons file for session', session)
+                continue
+
+            parameters = {'cons_file_path': path.join(CONSOLIDATED_FOLDER, cons_file_path),
+                          'consolidated_folder': CONSOLIDATED_FOLDER,
+                          'predictions_folder': PREDICTIONS_FOLDER,
+                          'crises_folder': CRISES_FOLDER}
+            parameters_list.append(parameters)
+        return parameters_list
+
+    @task()
+    def t_generate_predictions(parameters_list: List[dict]) -> List[dict]:
+        from src.usecase.generate_predictions import generate_predictions
+        import pickle
+        try:
+            with open('ml_model.pkl', 'rb') as f:
+                model = pickle.load(f)
+            if hasattr(model, 'best_estimator_'):
+                model = model.best_estimator_
+        except Exception as err:
+            logging.warn(f'Cannot generate predictions: {err}')
+            model = None
+
+        def inner(parameters: dict) -> dict:
+            return {
+                'predictions_file_path': generate_predictions(model,
+                                                              parameters['cons_file_path'],
+                                                              parameters['predictions_folder'])
+            }
+        return map_parameters(inner, parameters_list)
+
+    @task()
+    def t_identify_crises(parameters_list: List[List[dict]]) -> None:
+        from src.usecase.identify_crises import identify_crises
+        identify_crises(PREDICTIONS_FOLDER, CRISES_FOLDER)
+
+    output_parameters = []
+    for partition_index in range(NUM_PARTITIONS):
+        parameters_list = t_get_initial_parameters(partition_index)
+        parameters_list = t_generate_predictions(parameters_list)
+        output_parameters.append(parameters_list)
+
+    t_identify_crises(output_parameters)
+
+
 dag_pipeline = dag_seizure_detection_pipeline()
+model_pipeline = dag_model_pipeline()
