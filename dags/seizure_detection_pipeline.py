@@ -1,3 +1,4 @@
+import os
 from typing import Callable, List
 from datetime import datetime
 import logging
@@ -296,8 +297,10 @@ def dag_model_pipeline():
         return parameters_list
 
     @task()
-    def t_generate_predictions(parameters_list: List[dict]) -> List[dict]:
+    def t_generate_predictions_and_shap(parameters_list: List[dict]) -> List[dict]:
         from src.usecase.generate_predictions import generate_predictions
+        from src.usecase.shap_pipeline import shap_pipeline
+        import pandas as pd
         import pickle
         try:
             with open('ml_model.pkl', 'rb') as f:
@@ -309,10 +312,17 @@ def dag_model_pipeline():
             model = None
 
         def inner(parameters: dict) -> dict:
+            os.makedirs(parameters['predictions_folder'], exist_ok=True)
+            predictions_file_path = os.path.join(
+                parameters['predictions_folder'],
+                os.path.basename(parameters['cons_file_path']),
+            )
+            df = pd.read_csv(parameters['cons_file_path'])
+            generate_predictions(model, df)
+            shap_pipeline(model, df)
+            df.to_csv(predictions_file_path)
             return {
-                'predictions_file_path': generate_predictions(model,
-                                                              parameters['cons_file_path'],
-                                                              parameters['predictions_folder'])
+                'predictions_file_path': predictions_file_path
             }
         return map_parameters(inner, parameters_list)
 
@@ -324,7 +334,7 @@ def dag_model_pipeline():
     output_parameters = []
     for partition_index in range(NUM_PARTITIONS):
         parameters_list = t_get_initial_parameters(partition_index)
-        parameters_list = t_generate_predictions(parameters_list)
+        parameters_list = t_generate_predictions_and_shap(parameters_list)
         output_parameters.append(parameters_list)
 
     t_identify_crises(output_parameters)

@@ -14,10 +14,7 @@ from src.usecase.compute_hrvanalysis_features import FEATURES_KEY_TO_INDEX
 
 
 def generate_predictions(model,
-                         cons_file: str,
-                         output_folder: str = 'output/preds-v0_6'):
-    os.makedirs(output_folder, exist_ok=True)
-    df = pd.read_csv(cons_file)
+                         df: pd.DataFrame,):
     df['predicted_label'] = np.nan
 
     if model is not None:
@@ -25,9 +22,6 @@ def generate_predictions(model,
         notna = ~(x.isna().any(axis=1) | np.isinf(x).any(axis=1))
         if notna.any():
             df.loc[notna, 'predicted_label'] = model.predict(x[notna])
-    output_file = os.path.join(output_folder, os.path.basename(cons_file))
-    df.to_csv(output_file, index=False)
-    return output_file
 
 
 def generate_predictions_cli(model_path: str,
@@ -37,7 +31,13 @@ def generate_predictions_cli(model_path: str,
         model = pickle.load(f)
     if hasattr(model, 'best_estimator_'):
         model = model.best_estimator_
-    return generate_predictions(model, cons_file, output_folder)
+
+    df = pd.read_csv(cons_file)
+    generate_predictions(model, df, output_folder)
+
+    os.makedirs(output_folder, exist_ok=True)
+    output_file = os.path.join(output_folder, os.path.basename(cons_file))
+    df.to_csv(output_file, index=False)
 
 
 def parse_generate_prediction_args(
