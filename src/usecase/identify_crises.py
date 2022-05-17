@@ -58,6 +58,7 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
     pred_crises = []
     sessions = []
     crises_intersections = []
+    metrics = {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0}
     for i, cons_file in enumerate(glob.iglob(os.path.join(cons_folder, "**/*.csv"), recursive=True)):
         cons_file_name = os.path.basename(cons_file)
         patient_and_session_id = cons_file_name.replace('cons_', '').replace('.csv', '')
@@ -70,6 +71,14 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
         if not is_sorted(df['interval_start_time'].to_numpy()):
             print(f'[{i}] Sorting {cons_file_name} because it\'s not already sorted')
             df.sort_values('interval_start_time')
+
+        df_preds = df.dropna(subset=['label', 'predicted_label'])
+        if not df_preds.empty:
+            tn, fp, fn, tp = confusion_matrix(df_preds['label'], df_preds['predicted_label'], labels=[0, 1]).ravel()
+            metrics['tn'] += tn
+            metrics['fp'] += fp
+            metrics['fn'] += fn
+            metrics['tp'] += tp
 
         sessions.append({
             'patient_id': patient_id,
@@ -115,14 +124,19 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
                 })
         print(f'[{i}] Processed {cons_file} - total stats: {len(real_crises)} real crises, {len(pred_crises)} predicted crises')
 
-    tagged_crises, metrics = compute_metrics(real_crises, pred_crises, crises_intersections)
+    metrics['sensitivity'] = metrics['tp'] / (metrics['tp'] + metrics['fn'])
+    metrics['specitivity'] = metrics['tn'] / (metrics['tn'] + metrics['fp'])
+    tagged_crises, crises_metrics = compute_metrics(real_crises, pred_crises, crises_intersections)
+    metrics.update(crises_metrics)
 
     dicts_to_csv(real_crises, os.path.join(output_folder, 'real_crises.csv'), drop=['start', 'end'])
     dicts_to_csv(pred_crises, os.path.join(output_folder, 'pred_crises.csv'), drop=['start', 'end'])
     dicts_to_csv(crises_intersections, os.path.join(output_folder, 'intersections.csv'))
     dicts_to_csv(sessions, os.path.join(output_folder, 'sessions.csv'))
     dicts_to_csv(tagged_crises, os.path.join(output_folder, 'tagged_crises.csv'))
-    print(metrics)
+
+    metrics_df = pd.DataFrame(metrics, index=['value']).T
+    metrics_df.to_csv(os.path.join(output_folder, 'metrics.csv'), index_label='metric')
 
 
 def split_and_sort_crises(real_it: Peekable[Interval], pred_it: Peekable[Interval]) \
@@ -161,7 +175,7 @@ def split_interval(start, end, split_start, split_end) -> Iterable[Tuple[int, in
 def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_intersections: List[dict]):
     tagged_crises = []
     processed_pred_ids = set()
-    metrics = {'fp': 0, 'tp': 0, 'fn': 0}
+    crises_metrics = {metric: 0 for metric in ('crises_fp', 'crises_tp', 'crises_fn')}
 
     real_to_pred = {real_id: [] for real_id in range(len(real_crises))}
     for intersection in crises_intersections:
@@ -189,8 +203,8 @@ def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_int
 
         # Detect false positive
         overlap = intersection_length / real_length
-        classification = 'tp' if overlap > MIN_PREDICTION_OVERLAP_PERCENT else 'fn'
-        metrics[classification] += 1
+        classification = 'crises_tp' if overlap > MIN_PREDICTION_OVERLAP_PERCENT else 'crises_fn'
+        crises_metrics[classification] += 1
         tagged_crises.append({
             'real_id': real_id,
             'pred_id': None,
@@ -215,9 +229,9 @@ def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_int
             'overlap': 0.0,
             'classification': 'fp'
         })
-        metrics['fp'] += 1
+        crises_metrics['crises_fp'] += 1
 
-    return tagged_crises, metrics
+    return tagged_crises, crises_metrics
 
 
 def get_ranges(iterable: Iterable, target_val) -> Iterable[Tuple[int, int]]:
