@@ -1,14 +1,13 @@
-# TODO: add Dashboards in this folder
 apiVersion: 1
 
 providers:
   - name: dashboards
-    orgId: 1
+    orgId: 
     folder: ''
     type: file
-    disableDeletion: false
-    updateIntervalSeconds: 30
+    disableDetection: false
+    updateIntervalSeconds: 10
     editable: true
-    allowUiUpdates: true
+    allowUpdates: true
     options:
       path: '/etc/grafana/provisioning'

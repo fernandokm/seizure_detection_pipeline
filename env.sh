@@ -1,7 +1,7 @@
 # InfluxDB env vars
 export INFLUXDB_USERNAME=admin
-export INFLUXDB_PASSWORD=auraadmin
-export INFLUXDB_DATABASE=hackathon
+export INFLUXDB_PASSWORD=wdkjsdk8hcjbw
+export INFLUXDB_DATABASE=visualizations
 
 # Grafana env vars
 export GRAFANA_USERNAME=admin
@@ -12,7 +12,8 @@ export POSTGRES_DATABASE_GRAFANA=grafana
 export POSTGRES_HOST_URL=postgres
 export POSTGRES_DATABASE=postgres
 export POSTGRES_USER=postgres
-export POSTGRES_PASSWORD=postgres
+export POSTGRES_PASSWORD=wdkjsdk8hcjbw
+export POSTGRES_LOCALHOST=localhost
 
 # Airflow env vars
 export POSTGRES_DATABASE_AIRFLOW=airflow

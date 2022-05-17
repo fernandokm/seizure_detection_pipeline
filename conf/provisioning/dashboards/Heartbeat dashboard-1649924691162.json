@@ -1,0 +1,78 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "aliasColors": {},
+      "cacheTimeout": null,
+      "css_data": "",
+      "datasource": null,
+      "doInit": {},
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "format": "short",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "handleMetric": {},
+      "html_data": "<a href=\"http://localhost:3000/?orgId=1&from=1160377795291&to=1160378641955&viewPanel=2\">Complete view</a> \n<a href=\"http://localhost:3000/?orgId=1&from=1160377795291&to=1160377995291&viewPanel=2\">Zoomed view</a> ",
+      "id": 6,
+      "interval": null,
+      "js_code": "",
+      "js_init_code": "",
+      "links": [],
+      "maxDataPoints": 3,
+      "nullPointMode": "connected",
+      "pluginVersion": "7.3.4",
+      "targets": [
+        {
+          "queryType": "randomWalk",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "HTML panel",
+      "type": "aidanmountford-html-panel"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 26,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2006-10-09T07:09:55.291Z",
+    "to": "2006-10-09T07:24:01.955Z"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "HTML dashboard",
+  "uid": "GLlFOE87z",
+  "version": 1
+}
