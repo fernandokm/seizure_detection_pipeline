@@ -129,8 +129,11 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
     tagged_crises, crises_metrics = compute_metrics(real_crises, pred_crises, crises_intersections)
     metrics.update(crises_metrics)
 
-    dicts_to_csv(real_crises, os.path.join(output_folder, 'real_crises.csv'), drop=['start', 'end'])
-    dicts_to_csv(pred_crises, os.path.join(output_folder, 'pred_crises.csv'), drop=['start', 'end'])
+    for c in real_crises:
+        c['type'] = 'real'
+    for c in pred_crises:
+        c['type'] = 'predicted'
+    dicts_to_csv(real_crises+pred_crises, os.path.join(output_folder, 'crises.csv'), drop=['start', 'end'])
     dicts_to_csv(crises_intersections, os.path.join(output_folder, 'intersections.csv'))
     dicts_to_csv(sessions, os.path.join(output_folder, 'sessions.csv'))
     dicts_to_csv(tagged_crises, os.path.join(output_folder, 'tagged_crises.csv'))
