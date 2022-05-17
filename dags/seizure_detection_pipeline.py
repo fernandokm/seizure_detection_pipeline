@@ -312,15 +312,18 @@ def dag_model_pipeline():
             model = None
 
         def inner(parameters: dict) -> dict:
-            os.makedirs(parameters['predictions_folder'], exist_ok=True)
             predictions_file_path = os.path.join(
                 parameters['predictions_folder'],
                 os.path.basename(parameters['cons_file_path']),
             )
-            df = pd.read_csv(parameters['cons_file_path'])
-            generate_predictions(model, df)
-            shap_pipeline(model, df)
-            df.to_csv(predictions_file_path)
+            if os.path.isfile(predictions_file_path):
+                print('Skipping: output file already exists')
+            else:
+                os.makedirs(parameters['predictions_folder'], exist_ok=True)
+                df = pd.read_csv(parameters['cons_file_path'])
+                generate_predictions(model, df)
+                shap_pipeline(model, df)
+                df.to_csv(predictions_file_path)
             return {
                 'predictions_file_path': predictions_file_path
             }
