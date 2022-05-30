@@ -23,9 +23,8 @@ x-airflow-common:
     - ./scripts:/opt/airflow/scripts
     - ${DATA_PATH}/${SYMLINK_FOLDER}:/opt/airflow/data/${SYMLINK_FOLDER}
     - ./output:/opt/airflow/output
-    - ./models:/opt/airflow/models
+    - ./pipeline_models:/opt/airflow/pipeline_models
     - ./src:/opt/airflow/src
-    - ./ml_model.pkl:/opt/airflow/ml_model.pkl
     - ./great_expectations:/opt/airflow/great_expectations
   user: "${AIRFLOW_UID}:0"
   depends_on:
