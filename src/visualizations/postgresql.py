@@ -38,22 +38,35 @@ def generate_table(cursor, table, content):
     content: table content
     """
     cursor.execute(f"DROP TABLE IF EXISTS {table}")
-    first_row: list = content[0]
-
-    def type_maping(item):
-        column, value = item
-        if type(value) == str:
-            return f"{column} varchar(255)"
-        elif isinstance(value, datetime):
-            return f"{column} timestamp"
-        elif isinstance(value, float):
-            return f"{column} double precision"
-        else:
-            return f"{column} integer"
-
-    columns_sql = ", ".join((map(type_maping, first_row.items())))
+    columns_sql = ", ".join(format_sql_columns(content))
     cursor.execute(f"CREATE TABLE {table} ({columns_sql})")
     fill_table(cursor, table, content)
+
+
+def format_sql_columns(l):
+    """
+    Returns the list of columns postgresql types
+    l - list of dicts
+    return: list of postgresql types
+    """
+    columns = l[0].keys()
+    nb_rows = len(l)
+    return_list = []
+    for column in columns:
+        i = 0
+        while i < nb_rows - 1 or l[i][column] == float("NaN"):
+            i += 1
+        if i >= nb_rows:
+            return_list.append(f"{column} varchar(255)")
+        elif isinstance(l[i][column], datetime):
+            return_list.append(f"{column} timestamp")
+        elif isinstance(l[i][column], float):
+            return_list.append(f"{column} double precision")
+        elif isinstance(l[i][column], int):
+            return_list.append(f"{column} integer")
+        else:
+            return_list.append(f"{column} varchar(255)")
+    return return_list
 
 
 def fill_table(cursor, table, content):
