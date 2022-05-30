@@ -17,36 +17,41 @@ from src.usecase.compute_hrvanalysis_features import FEATURES_KEY_TO_INDEX
 def explanation_pipeline(models, db):
     model_columns = list(FEATURES_KEY_TO_INDEX.keys())
     shap_columns = [0]*len(model_columns)
-    # lime_columns = [0]*len(model_columns)
-    # lime_table = np.full((db.shape[0], len(model_columns)), np.nan)
+    lime_columns = [0]*len(model_columns)
+    lime_table = np.full((db.shape[0], len(model_columns)), np.nan)
     for i in range(len(model_columns)):
         shap_columns[i] = "shap_values_"+model_columns[i]
-        # lime_columns[i] = "lime_values_"+model_columns[i]
+        lime_columns[i] = "lime_values_"+model_columns[i]
     db.loc[:, shap_columns] = np.nan
-    # db.loc[:, lime_columns] = np.nan
+    db.loc[:, lime_columns] = np.nan
     for model_name, model in models.items():
         x = db.loc[:, model_columns]
         row_mask = (db['model'] == model_name) & ~x.isna().any(axis=1) & ~np.isinf(x).any(axis=1)
         if not row_mask.any():
             continue
         explainer_patient = shap.TreeExplainer(model)
-        # explainer_lime = lime_tabular.LimeTabularExplainer(training_data=db.loc[row_mask, model_columns].values,
-        #                                                    mode='classification',
-        #                                                    class_names=['no seizure', 'seizure'],
-        #                                                    feature_names=model_columns)
         shap_values_graf = explainer_patient.shap_values(db.loc[row_mask, model_columns])
         db.loc[row_mask, shap_columns] = shap_values_graf[1]
         print('Computed shap values for model', model_name)
-        # for i in np.flatnonzero(row_mask):
-        #     sample = db.iloc[i].loc[model_columns].values.astype(np.float32)
-        #     if np.isnan(sample).any() or np.isinf(sample).any():
-        #         continue
-        #     exp = explainer_lime.explain_instance(
-        #         sample, model.predict_proba, labels=(0, 1), num_features=len(model_columns))
-        #     for j in range(len(model_columns)):
-        #         lime_table[i, j] = exp.as_list()[j][1]
-        # print('Computed lime explanation for model', model_name)
-    # db.loc[:, lime_columns] = lime_table
+        
+        explainer_lime = lime_tabular.LimeTabularExplainer(training_data=db.loc[row_mask, model_columns].values,
+                                                           mode='classification',
+                                                           class_names=['no seizure', 'seizure'],
+                                                           feature_names=model_columns)
+        prev_label = np.nan
+        prev_pred_label = np.nan
+        for i in np.flatnonzero(row_mask):
+            row = db.iloc[i]
+            sample = row.loc[model_columns].values
+            if (prev_label != 1 and row['label'] == 1) or (prev_pred_label != 1 and row['predicted_label'] == 1):
+                exp = explainer_lime.explain_instance(
+                    sample, model.predict_proba, labels=(0, 1), num_features=len(model_columns), num_samples=2000)
+                for j in range(len(model_columns)):
+                    lime_table[i, j] = exp.as_list()[j][1]
+            prev_label = row['label']
+            prev_pred_label = row['predicted_label']
+        print('Computed lime explanation for model', model_name)
+    db.loc[:, lime_columns] = lime_table
 
 
 def explanation_pipeline_cli(model_name, db_name, output_file):
