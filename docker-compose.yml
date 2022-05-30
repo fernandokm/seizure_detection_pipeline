@@ -134,6 +134,17 @@ services:
     <<: *airflow-common
     container_name: aura-airflow-worker
     command: celery worker
+    environment:
+      <<: *airflow-common-env
+      POSTGRES_HOST_URL: $POSTGRES_HOST_URL
+      POSTGRES_DATABASE: $POSTGRES_DATABASE
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      INFLUXDB_HOST_URL: $INFLUXDB_HOST_URL
+      INFLUXDB_PORT: $INFLUXDB_PORT
+      INFLUXDB_USERNAME: $INFLUXDB_USERNAME
+      INFLUXDB_PASSWORD: $INFLUXDB_PASSWORD
+      INFLUXDB_DATABASE: $INFLUXDB_DATABASE
     healthcheck:
       test:
         - "CMD-SHELL"
