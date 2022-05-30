@@ -155,7 +155,7 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
     metrics_df = pd.DataFrame([{'model': model, 'metric': metric, 'value': value}
                                for model, model_metrics in metrics.items()
                                for metric, value in model_metrics.items()])
-    metrics_df.to_csv(os.path.join(output_folder, 'metrics.csv'), index_label='metric')
+    metrics_df.to_csv(os.path.join(output_folder, 'metrics.csv'), index=False)
 
 
 def split_and_sort_crises(real_it: Peekable[Interval], pred_it: Peekable[Interval]) \

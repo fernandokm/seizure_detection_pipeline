@@ -348,7 +348,7 @@ def dag_model_pipeline():
             print('Generated predictions')
             explanation_pipeline(models, df)
             print('Generated explanations')
-            df.to_csv(predictions_file_path)
+            df.to_csv(predictions_file_path, index=False)
             return {
                 'predictions_file_path': predictions_file_path
             }
