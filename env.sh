@@ -1,4 +1,5 @@
 # InfluxDB env vars
+export INFLUXDB_HOST_URL=influxdb
 export INFLUXDB_USERNAME=admin
 export INFLUXDB_PASSWORD=wdkjsdk8hcjbw
 export INFLUXDB_DATABASE=visualizations

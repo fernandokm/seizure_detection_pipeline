@@ -27,6 +27,7 @@ FEATURES_FOLDER = '/'.join([OUTPUT_FOLDER, 'feats-v0_6'])
 CONSOLIDATED_FOLDER = '/'.join([OUTPUT_FOLDER, 'cons-v0_6'])
 PREDICTIONS_FOLDER = '/'.join([OUTPUT_FOLDER, 'preds-v0_6'])
 CRISES_FOLDER = '/'.join([OUTPUT_FOLDER, 'crises-v0_6'])
+DEFAULT_MODEL_FOLDER = 'pipeline_models'
 # DICT_PARAMS_EDF_FILE = {
 #     "patient": "PAT_6",
 #     "record": "77",
@@ -294,7 +295,15 @@ def dag_model_pipeline():
         print('Running partition', partition_index, '(rows', partition_start, 'to', partition_end-1, ')')
         df_db = df_db.iloc[partition_start:partition_end]
 
-        model_paths = get_current_context()['params']['model_paths']
+        model_paths = get_current_context()['params'].get('model_paths', {})
+        if not model_paths:
+            print('No models specified, loading all available models')
+            for file in os.listdir(DEFAULT_MODEL_FOLDER):
+                if file.lower().endswith('.pkl'):
+                    model_name = file[:-4]
+                    model_path = os.path.join(DEFAULT_MODEL_FOLDER, file)
+                    model_paths[model_name] = model_path
+            print('Running with models:', model_paths)
 
         cons_files = os.listdir(CONSOLIDATED_FOLDER)
         parameters_list = []
@@ -377,16 +386,19 @@ def dag_grafana_pipeline():
             'csv_sources': {},
             'csv_crises': {
                 "crises": path.join(CRISES_FOLDER, "crises.csv"),
-                "metrics": path.join(OUTPUT_FOLDER, "metrics.csv")
+                "metrics": path.join(CRISES_FOLDER, "metrics.csv"),
+                "intersections": path.join(CRISES_FOLDER, "intersections.csv"),
+                "sessions": path.join(CRISES_FOLDER, "sessions.csv"),
+                "tagged_crises": path.join(CRISES_FOLDER, "tagged_crises.csv"),
             },
         }
 
-        preds_files = os.listdir(PREDICTIONS_FOLDER)
+        preds_files = [os.path.join(PREDICTIONS_FOLDER, file) for file in os.listdir(PREDICTIONS_FOLDER)]
         df_db = pd.read_csv(f'{FETCHED_DATA_FOLDER}/df_candidates.csv', encoding='utf-8')
-        for row in df_db.iterrows():
-            qrs_file_path = row['edf_file_path']
-            session, _ = path.splitext(path.basename(qrs_file_path))
-            parameters["qrs_sources"][session] = qrs_file_path
+        for _, row in df_db.iterrows():
+            edf_file_path = row['edf_file_path']
+            session, _ = path.splitext(path.basename(edf_file_path))
+            parameters["edf_sources"][session] = edf_file_path
 
             matches = [f for f in preds_files if session in f]
             if matches:
@@ -399,18 +411,18 @@ def dag_grafana_pipeline():
         return parameters
 
     @task()
-    def t_generate_postgresql_data(csv_files: dict) -> None:
+    def t_generate_postgresql_data(parameters: dict) -> None:
         from src.visualizations.generate_data import generate_postgresql_data
-        generate_postgresql_data(csv_files)
+        generate_postgresql_data({**parameters["csv_crises"], **parameters["csv_sources"]})
 
     @task()
-    def t_generate_influxdb_data(edf_files: dict, csv_files: dict) -> None:
+    def t_generate_influxdb_data(parameters: dict) -> None:
         from src.visualizations.generate_data import generate_influxdb_data
-        generate_influxdb_data(edf_files, csv_files)
+        generate_influxdb_data(edf_files=parameters["edf_sources"], csv_files={})
 
     parameters = t_get_initial_parameters()
-    t_generate_postgresql_data(parameters["csv_crises"] | parameters["csv_sources"])
-    t_generate_influxdb_data(parameters["edf_sources"])
+    t_generate_postgresql_data(parameters)
+    t_generate_influxdb_data(parameters)
 
 
 dag_pipeline = dag_seizure_detection_pipeline()

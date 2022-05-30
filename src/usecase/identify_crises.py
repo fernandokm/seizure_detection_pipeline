@@ -120,7 +120,7 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
                 # add to lists
                 if is_real:
                     real_start, real_end = interval
-                    real_crises.append(get_crisis(real_start, real_end, model=model))
+                    real_crises.append(get_crisis(real_start, real_end))
                 else:
                     pred_start, pred_end = interval
                     pred_crises.append(get_crisis(pred_start, pred_end, model=model))
@@ -223,8 +223,8 @@ def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_int
 
         # Detect false positive
         overlap = intersection_length / real_length
-        classification = 'crises_tp' if overlap > MIN_PREDICTION_OVERLAP_PERCENT else 'crises_fn'
-        crises_metrics[classification] += 1
+        classification = 'tp' if overlap > MIN_PREDICTION_OVERLAP_PERCENT else 'fn'
+        crises_metrics['crises_' + classification] += 1
         tagged_crises.append({
             'real_id': real_id,
             'pred_id': None,

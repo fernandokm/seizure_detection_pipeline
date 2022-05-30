@@ -4,12 +4,12 @@ from src.visualizations import influxDB
 from src.visualizations import postgresql
 from src.visualizations.log import log
 
-POSTGRES_HOST_URL = os.environ.get("POSTGRES_LOCALHOST")
+POSTGRES_HOST_URL = os.environ.get("POSTGRES_HOST_URL")
 POSTGRES_DATABASE = os.environ.get("POSTGRES_DATABASE")
 POSTGRES_USER = os.environ.get("POSTGRES_USER")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 
-IDB_HOST = "localhost"
+IDB_HOST = os.environ.get("INFLUXDB_HOST_URL")
 IDB_PORT = os.environ.get("INFLUXDB_PORT")
 IDB_USERNAME = os.environ.get("INFLUXDB_USERNAME")
 IDB_PASSWORD = os.environ.get("INFLUXDB_PASSWORD")
