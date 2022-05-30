@@ -47,7 +47,7 @@ def generate_table(cursor, table, content):
         elif isinstance(value, datetime):
             return f"{column} timestamp"
         elif isinstance(value, float):
-            return f"{column} double"
+            return f"{column} double precision"
         else:
             return f"{column} integer"
 
