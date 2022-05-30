@@ -1,9 +1,10 @@
 import os
-from typing import Callable, List
+from typing import Callable, Dict, List
 from datetime import datetime
 import logging
 
 from airflow.decorators import dag, task
+from airflow.operators.python import get_current_context
 import sys
 sys.path.append('.')
 
@@ -256,13 +257,30 @@ def dag_seizure_detection_pipeline():
         # t_ecg_qc_statistical_analysis(chunk_file=file_quality)
 
 
-@dag(default_args=DEFAULT_ARGS,
+@dag(default_args={
+        'model_paths': {},
+        **DEFAULT_ARGS,
+     },
      dag_id='model_pipeline',
      description='Start the whole seizure detection pipeline',
      start_date=START_DATE,
      schedule_interval=SCHEDULE_INTERVAL,
      concurrency=CONCURRENCY)
 def dag_model_pipeline():
+    def load_models(model_paths: dict):
+        import pickle
+        models = {}
+        for model_name, model_path in model_paths.items():
+            try:
+                with open(model_path, 'rb') as f:
+                    model = pickle.load(f)
+                if hasattr(model, 'best_estimator_'):
+                    model = model.best_estimator_
+                models[model_name] = model
+            except Exception as err:
+                raise RuntimeError(f'Cannot generate predictions for model {model_name} at {model_path}') from err
+        return models
+
     @task()
     def t_get_initial_parameters(partition_index: int) -> List[dict]:
         import pandas as pd
@@ -273,7 +291,10 @@ def dag_model_pipeline():
         partition_size = (df_db.shape[0] + NUM_PARTITIONS - 1) // NUM_PARTITIONS
         partition_start = partition_index * partition_size
         partition_end = (partition_index+1) * partition_size
+        print('Running partition', partition_index, '(rows', partition_start, 'to', partition_end-1, ')')
         df_db = df_db.iloc[partition_start:partition_end]
+
+        model_paths = get_current_context()['params']['model_paths']
 
         cons_files = os.listdir(CONSOLIDATED_FOLDER)
         parameters_list = []
@@ -292,38 +313,33 @@ def dag_model_pipeline():
             parameters = {'cons_file_path': path.join(CONSOLIDATED_FOLDER, cons_file_path),
                           'consolidated_folder': CONSOLIDATED_FOLDER,
                           'predictions_folder': PREDICTIONS_FOLDER,
-                          'crises_folder': CRISES_FOLDER}
+                          'crises_folder': CRISES_FOLDER,
+                          'model_paths': model_paths}
             parameters_list.append(parameters)
         return parameters_list
 
     @task()
     def t_generate_predictions_and_shap(parameters_list: List[dict]) -> List[dict]:
+        if not parameters_list:
+            return []
+
         from src.usecase.generate_predictions import generate_predictions
-        from src.usecase.shap_pipeline import shap_pipeline
+        from src.usecase.explanation_pipeline import explanation_pipeline
         import pandas as pd
-        import pickle
-        try:
-            with open('ml_model.pkl', 'rb') as f:
-                model = pickle.load(f)
-            if hasattr(model, 'best_estimator_'):
-                model = model.best_estimator_
-        except Exception as err:
-            logging.warn(f'Cannot generate predictions: {err}')
-            model = None
+        models = load_models(parameters_list[0]['model_paths'])
 
         def inner(parameters: dict) -> dict:
             predictions_file_path = os.path.join(
                 parameters['predictions_folder'],
                 os.path.basename(parameters['cons_file_path']),
             )
-            if os.path.isfile(predictions_file_path):
-                print('Skipping: output file already exists')
-            else:
-                os.makedirs(parameters['predictions_folder'], exist_ok=True)
-                df = pd.read_csv(parameters['cons_file_path'])
-                generate_predictions(model, df)
-                shap_pipeline(model, df)
-                df.to_csv(predictions_file_path)
+            os.makedirs(parameters['predictions_folder'], exist_ok=True)
+            df = pd.read_csv(parameters['cons_file_path'])
+            df = generate_predictions(models, df)
+            print('Generated predictions')
+            explanation_pipeline(models, df)
+            print('Generated explanations')
+            df.to_csv(predictions_file_path)
             return {
                 'predictions_file_path': predictions_file_path
             }
@@ -343,5 +359,60 @@ def dag_model_pipeline():
     t_identify_crises(output_parameters)
 
 
+@dag(default_args=DEFAULT_ARGS,
+     dag_id='grafana_pipeline',
+     description='Start the grafana pipeline',
+     start_date=START_DATE,
+     schedule_interval=SCHEDULE_INTERVAL,
+     concurrency=CONCURRENCY)
+def dag_grafana_pipeline():
+    @task()
+    def t_get_initial_parameters() -> dict:
+        import pandas as pd
+        import os
+        from os import path
+
+        parameters = {
+            'edf_sources': {},
+            'csv_sources': {},
+            'csv_crises': {
+                "crises": path.join(CRISES_FOLDER, "crises.csv"),
+                "metrics": path.join(OUTPUT_FOLDER, "metrics.csv")
+            },
+        }
+
+        preds_files = os.listdir(PREDICTIONS_FOLDER)
+        df_db = pd.read_csv(f'{FETCHED_DATA_FOLDER}/df_candidates.csv', encoding='utf-8')
+        for row in df_db.iterrows():
+            qrs_file_path = row['edf_file_path']
+            session, _ = path.splitext(path.basename(qrs_file_path))
+            parameters["qrs_sources"][session] = qrs_file_path
+
+            matches = [f for f in preds_files if session in f]
+            if matches:
+                parameters["csv_sources"][session] = matches[0]
+                print('Found preds file', matches[0])
+            else:
+                print('No preds file for session', session)
+                continue
+
+        return parameters
+
+    @task()
+    def t_generate_postgresql_data(csv_files: dict) -> None:
+        from src.visualizations.generate_data import generate_postgresql_data
+        generate_postgresql_data(csv_files)
+
+    @task()
+    def t_generate_influxdb_data(edf_files: dict, csv_files: dict) -> None:
+        from src.visualizations.generate_data import generate_influxdb_data
+        generate_influxdb_data(edf_files, csv_files)
+
+    parameters = t_get_initial_parameters()
+    t_generate_postgresql_data(parameters["csv_crises"] | parameters["csv_sources"])
+    t_generate_influxdb_data(parameters["edf_sources"])
+
+
 dag_pipeline = dag_seizure_detection_pipeline()
 model_pipeline = dag_model_pipeline()
+grafana_pipeline = dag_grafana_pipeline()
