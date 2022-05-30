@@ -8,7 +8,7 @@ import argparse
 import os
 import glob
 import sys
-from typing import Hashable, Iterable, Iterator, List, Tuple, Generic, TypeVar
+from typing import Hashable, Iterable, Iterator, List, Optional, Tuple, Generic, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -58,7 +58,8 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
     pred_crises = []
     sessions = []
     crises_intersections = []
-    metrics = {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0}
+    metrics = {}
+    models = set()
     for i, cons_file in enumerate(glob.iglob(os.path.join(cons_folder, "**/*.csv"), recursive=True)):
         cons_file_name = os.path.basename(cons_file)
         patient_and_session_id = cons_file_name.replace('cons_', '').replace('.csv', '')
@@ -68,17 +69,7 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
         df['timestamp'] = df['timestamp'].values.astype(np.int64) / 10**9
         if 'predicted_label' not in df:
             df['predicted_label'] = np.nan
-        if not is_sorted(df['interval_start_time'].to_numpy()):
-            print(f'[{i}] Sorting {cons_file_name} because it\'s not already sorted')
-            df.sort_values('interval_start_time')
-
-        df_preds = df.dropna(subset=['label', 'predicted_label'])
-        if not df_preds.empty:
-            tn, fp, fn, tp = confusion_matrix(df_preds['label'], df_preds['predicted_label'], labels=[0, 1]).ravel()
-            metrics['tn'] += tn
-            metrics['fp'] += fp
-            metrics['fn'] += fn
-            metrics['tp'] += tp
+        df.sort_values('interval_start_time')
 
         sessions.append({
             'patient_id': patient_id,
@@ -88,7 +79,7 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
             'time_end': df.iloc[-1]['timestamp'],
         })
 
-        def get_crisis(start: int, end: int) -> dict:
+        def get_crisis(start: int, end: int, model: Optional[str] = None) -> dict:
             return {
                 'patient_id': patient_id,
                 'session_id': session_id,
@@ -96,49 +87,74 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
                 'end': end,
                 'time_start': df.iloc[start]['timestamp'],
                 'time_end': df.iloc[end]['timestamp'],
+                'type': 'real' if model is None else 'predicted',
+                'model': model,
             }
 
-        real_it = Peekable(iter(get_ranges(df['label'], target_val=1)))
-        pred_it = Peekable(iter(get_ranges(df['predicted_label'], target_val=1)))
-        real_start = real_end = pred_start = pred_end = -1
-        for interval, is_real in split_and_sort_crises(real_it, pred_it):
-            # add to lists
-            if is_real:
-                real_start, real_end = interval
-                real_crises.append(get_crisis(real_start, real_end))
-            else:
-                pred_start, pred_end = interval
-                pred_crises.append(get_crisis(pred_start, pred_end))
+        models.update(df['model'].unique())
+        real_ranges = None
+        for model in models:
+            df_model = df[df['model'] == model]
 
-            # detect intersections
-            if real_start == -1 or pred_start == -1:
-                continue
-            intersection_start = max(real_start, pred_start)
-            intersection_end = min(real_end, pred_end)
-            intersection_duration = intersection_end - intersection_start
-            if intersection_duration >= 1:
-                crises_intersections.append({
-                    'real_id': len(real_crises)-1,
-                    'pred_id': len(pred_crises)-1,
-                    'duration_elements': intersection_duration,
-                })
+            df_preds = df_model.dropna(subset=['label', 'predicted_label'])
+            metrics[model] = {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0}
+            if not df_preds.empty:
+                tn, fp, fn, tp = confusion_matrix(df_preds['label'], df_preds['predicted_label'], labels=[0, 1]).ravel()
+                metrics[model]['tn'] += tn
+                metrics[model]['fp'] += fp
+                metrics[model]['fn'] += fn
+                metrics[model]['tp'] += tp
+                
+            safe_div = lambda x, y: x/y if y != 0 else np.nan
+            metrics[model]['sensitivity'] = safe_div(metrics[model]['tp'], metrics[model]['tp'] + metrics[model]['fn'])
+            metrics[model]['specitivity'] = safe_div(metrics[model]['tn'], metrics[model]['tn'] + metrics[model]['fp'])
+
+            # Initilize real_ranges only for the first model
+            # Other models should use the same data, so we can just reuse the same real_ranges
+            if real_ranges is None:
+                real_ranges = list(get_ranges(df_model['label'], target_val=1))
+            real_it = Peekable(iter(real_ranges))
+            pred_it = Peekable(iter(get_ranges(df_model['predicted_label'], target_val=1)))
+            real_start = real_end = pred_start = pred_end = -1
+            for interval, is_real in split_and_sort_crises(real_it, pred_it):
+                # add to lists
+                if is_real:
+                    real_start, real_end = interval
+                    real_crises.append(get_crisis(real_start, real_end, model=model))
+                else:
+                    pred_start, pred_end = interval
+                    pred_crises.append(get_crisis(pred_start, pred_end, model=model))
+
+                # detect intersections
+                if real_start == -1 or pred_start == -1:
+                    continue
+                intersection_start = max(real_start, pred_start)
+                intersection_end = min(real_end, pred_end)
+                intersection_duration = intersection_end - intersection_start
+                if intersection_duration >= 1:
+                    crises_intersections.append({
+                        'real_id': len(real_crises)-1,
+                        'pred_id': len(pred_crises)-1,
+                        'duration_elements': intersection_duration,
+                        'model': model,
+                    })
         print(f'[{i}] Processed {cons_file} - total stats: {len(real_crises)} real crises, {len(pred_crises)} predicted crises')
 
-    metrics['sensitivity'] = metrics['tp'] / (metrics['tp'] + metrics['fn'])
-    metrics['specitivity'] = metrics['tn'] / (metrics['tn'] + metrics['fp'])
-    tagged_crises, crises_metrics = compute_metrics(real_crises, pred_crises, crises_intersections)
-    metrics.update(crises_metrics)
+    tagged_crises = []
+    for model in models:
+        tagged_crises_for_model, crises_metrics_for_model = \
+            compute_metrics(real_crises, pred_crises, crises_intersections, model=model)
+        metrics[model].update(crises_metrics_for_model)
+        tagged_crises += tagged_crises_for_model
 
-    for c in real_crises:
-        c['type'] = 'real'
-    for c in pred_crises:
-        c['type'] = 'predicted'
     dicts_to_csv(real_crises+pred_crises, os.path.join(output_folder, 'crises.csv'), drop=['start', 'end'])
     dicts_to_csv(crises_intersections, os.path.join(output_folder, 'intersections.csv'))
     dicts_to_csv(sessions, os.path.join(output_folder, 'sessions.csv'))
     dicts_to_csv(tagged_crises, os.path.join(output_folder, 'tagged_crises.csv'))
 
-    metrics_df = pd.DataFrame(metrics, index=['value']).T
+    metrics_df = pd.DataFrame([{'model': model, 'metric': metric, 'value': value}
+                               for model, model_metrics in metrics.items()
+                               for metric, value in model_metrics.items()])
     metrics_df.to_csv(os.path.join(output_folder, 'metrics.csv'), index_label='metric')
 
 
@@ -175,14 +191,15 @@ def split_interval(start, end, split_start, split_end) -> Iterable[Tuple[int, in
         yield (start, end)
 
 
-def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_intersections: List[dict]):
+def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_intersections: List[dict], model: str):
     tagged_crises = []
     processed_pred_ids = set()
     crises_metrics = {metric: 0 for metric in ('crises_fp', 'crises_tp', 'crises_fn')}
 
     real_to_pred = {real_id: [] for real_id in range(len(real_crises))}
     for intersection in crises_intersections:
-        real_to_pred[intersection['real_id']].append(intersection['pred_id'])
+        if pred_crises[intersection['pred_id']]['model'] == model:
+            real_to_pred[intersection['real_id']].append(intersection['pred_id'])
 
     for real_id, pred_ids in real_to_pred.items():
         real_start = real_crises[real_id]['start']
@@ -220,7 +237,7 @@ def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_int
         })
 
     for pred_id in range(len(pred_crises)):
-        if pred_id in processed_pred_ids:
+        if pred_id in processed_pred_ids or pred_crises[pred_id]['model'] != model:
             continue
         tagged_crises.append({
             'real_id': None,
@@ -229,6 +246,7 @@ def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_int
             'time_end': pred_crises[pred_id]['time_end'],
             'patient_id': pred_crises[pred_id]['patient_id'],
             'session_id': pred_crises[pred_id]['session_id'],
+            'model': model,
             'overlap': 0.0,
             'classification': 'fp'
         })
@@ -255,7 +273,8 @@ def is_sorted(arr: np.ndarray) -> bool:
 
 def dicts_to_csv(dicts: List[dict], path: str, drop: List[Hashable] = []):
     df = pd.DataFrame(dicts)
-    df.drop(drop, axis=1, inplace=True)
+    if drop and not df.empty:
+        df.drop(drop, axis=1, inplace=True)
     df.to_csv(path, index=False)
 
 
