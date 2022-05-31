@@ -18,7 +18,7 @@ def push_influxdb_data(
     retention_policy: str = "autogen",
     username: str = "root",
     password: str = "root",
-    **kwargs
+    **kwargs,
 ) -> None:
     """
     Push data to influxdb
@@ -28,11 +28,19 @@ def push_influxdb_data(
     token = f"{username}:{password}"
     bucket = f"{database}/{retention_policy}"
     with InfluxDBClient(url, token, org="-") as client:
-        with client.write_api(write_options=WriteOptions(batch_size=50000, flush_interval=10000)) as write_api:
+        with client.write_api(
+            write_options=WriteOptions(batch_size=50000, flush_interval=10000)
+        ) as write_api:
             write_api.write(bucket, record=data)
 
 
-def from_edf(filepath: str, channel: int, mesurement: Union[str, None] = None, tags: dict = {}, field: str = "Field") -> Iterator[str]:
+def from_edf(
+    filepath: str,
+    channel: int,
+    mesurement: Union[str, None] = None,
+    tags: dict = {},
+    field: str = "Field",
+) -> Iterator[str]:
     """
     Get points from edf file
     filepath: filepath
@@ -40,10 +48,12 @@ def from_edf(filepath: str, channel: int, mesurement: Union[str, None] = None, t
     """
     mesurement = escape(mesurement or filepath)
     with EdfReader(filepath) as r:
-        T_sample_real = 1/r.getSampleFrequency(channel)
+        T_sample_real = 1 / r.getSampleFrequency(channel)
         time = r.getStartdatetime()
-        tagslist = ",".join([f"{escape(k)}={escape(v)}" for k, v in tags.items(
-        )] + [f"channel={escape(r.getSignalLabels()[channel])}"])
+        tagslist = ",".join(
+            [f"{escape(k)}={escape(v)}" for k, v in tags.items()]
+            + [f"channel={escape(r.getSignalLabels()[channel])}"]
+        )
         tagslist = f",{tagslist}" if tagslist else ""
         for val in r.readSignal(channel):
             yield f"{mesurement}{tagslist} {escape(field)}={escapevalue(val)} {to_nanoseconds(time)}"
@@ -55,8 +65,18 @@ def push_ecg_to_influxdb(ecg_filepath: str, **kwargs) -> None:
     loader = EdfLoader(ecg_filepath)
     channel_label = loader.get_ecg_candidate_channel()
     channel = loader.channels.index(channel_label)
-    data = rx.from_iterable(from_edf(ecg_filepath, channel, mesurement="ecg", tags={"patient": kwargs.get(
-        "patient") or ecg_filepath.split("/")[-1].split(".")[0]}, field="Tension (uV)"))
+    data = rx.from_iterable(
+        from_edf(
+            ecg_filepath,
+            channel,
+            mesurement="ecg",
+            tags={
+                "patient": kwargs.get("patient")
+                or ecg_filepath.split("/")[-1].split(".")[0]
+            },
+            field="Tension (uV)",
+        )
+    )
     push_influxdb_data(data, **kwargs)
 
 
@@ -76,18 +96,33 @@ def escapevalue(value: Any) -> str:
         return str(value)
     except:
         if len(str(value)) > 0:
-            return f"\"{value}\""
+            return f'"{value}"'
         else:
             return ""
 
 
 def push_csv_features_to_influxdb(csv_filepath: str, **kwargs) -> None:
-    data = rx.from_iterable(from_csv(csv_filepath, measurement="features", tags={"patient": kwargs.get(
-        "patient") or csv_filepath.split("/")[-1].split(".")[0]}, time_column="timestamp"))
+    data = rx.from_iterable(
+        from_csv(
+            csv_filepath,
+            measurement="features",
+            tags={
+                "patient": kwargs.get("patient")
+                or csv_filepath.split("/")[-1].split(".")[0]
+            },
+            time_column="timestamp",
+        )
+    )
     push_influxdb_data(data, **kwargs)
 
 
-def from_csv(csv_filepath: str, measurement: Union[None, str] = None, tags: dict = {}, time_column: str = "timestamp", **kwargs) -> Iterator[str]:
+def from_csv(
+    csv_filepath: str,
+    measurement: Union[None, str] = None,
+    tags: dict = {},
+    time_column: str = "timestamp",
+    **kwargs,
+) -> Iterator[str]:
     """
     Get points from csv file
     csv_filepath: filepath
@@ -95,8 +130,7 @@ def from_csv(csv_filepath: str, measurement: Union[None, str] = None, tags: dict
     with open(csv_filepath, "r") as f:
         reader = csv.DictReader(f)
         measurement = escape(measurement or csv_filepath)
-        tagslist = ",".join(
-            [f"{escape(k)}={escape(v)}" for k, v in tags.items()])
+        tagslist = ",".join([f"{escape(k)}={escape(v)}" for k, v in tags.items()])
         tagslist = f",{tagslist}" if tagslist else ""
         for row in reader:
             time = row[time_column]
@@ -113,16 +147,24 @@ def to_nanoseconds(date_time: Any, mult_to_seconds=1):
     Convert date_time to nanoseconds
     date_time: can be str (int seconds timestamp), str (DD-MM-YYYY HH:MM:SS.m), datetime, int or float (in seconds)
     """
-    mult = 1e9*mult_to_seconds
+    mult = 1e9 * mult_to_seconds
+    print(date_time)
+    print(type(date_time))
     if type(date_time) == str:
         try:
-            return int(float(date_time)*mult)
+            return int(float(date_time) * mult)
         except:
-            return int(datetime.datetime.strptime(date_time, "%Y-%m-%d %H:%M:%S.%f").timestamp()*1e9)
+            return int(
+                datetime.datetime.strptime(
+                    date_time, "%Y-%m-%d %H:%M:%S.%f"
+                ).timestamp()
+                * 1e9
+            )
     elif type(date_time) in [int, float, float64]:
-        return int(date_time*mult)
+        return int(date_time * mult)
     elif type(date_time) == datetime.datetime:
-        return int(date_time.timestamp()*1e9)
+        return int(date_time.timestamp() * 1e9)
     raise TypeError("Invalid date_time type: {}".format(type(date_time)))
+
 
 # TODO : add function to test if patient data already exists

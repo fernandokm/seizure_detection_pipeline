@@ -14,10 +14,10 @@ IDB_PASSWORD = os.environ.get("INFLUXDB_PASSWORD")
 IDB_DATABASE = os.environ.get("INFLUXDB_DATABASE")
 
 PATIENT_DASHBOARD = os.path.join(
-    os.path.dirpath(__file__), "../../conf/provisioning/dashboards/patient.json"
+    os.path.dirname(__file__), "../../conf/provisioning/dashboards/patient.json"
 )
 HOME_DASHBOARD = os.path.join(
-    os.path.dirpath(__file__), "../../conf/provisioning/dashboards/main.json"
+    os.path.dirname(__file__), "../../conf/provisioning/dashboards/main.json"
 )
 PATIENT_NAMES_LINES = 18239
 PATIENT_NAMES_FILE = os.path.join(os.path.dirname(__file__), "names.txt")
