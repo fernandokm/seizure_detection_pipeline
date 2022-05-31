@@ -26,7 +26,7 @@ x-airflow-common:
     - ./pipeline_models:/opt/airflow/pipeline_models
     - ./src:/opt/airflow/src
     - ./great_expectations:/opt/airflow/great_expectations
-    - ./conf/:/opt/airflow/conf/
+    - ./conf:/opt/airflow/conf
   user: "${AIRFLOW_UID}:0"
   depends_on:
     redis:
