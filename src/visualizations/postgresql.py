@@ -37,11 +37,11 @@ def generate_table(cursor, table, content):
     table: table name
     content: table content
     """
-    cursor.execute(f"DROP TABLE IF EXISTS \"{table}\"")
+    cursor.execute(f'DROP TABLE IF EXISTS "{table}"')
     sql_columns_list = format_sql_columns(content)
-    if sql_columns_list is not None : 
+    if sql_columns_list is not None:
         columns_sql = ", ".join(sql_columns_list)
-        cursor.execute(f"CREATE TABLE \"{table}\" ({columns_sql})")
+        cursor.execute(f'CREATE TABLE "{table}" ({columns_sql})')
         fill_table(cursor, table, content)
 
 
@@ -51,7 +51,7 @@ def format_sql_columns(l):
     l - list of dicts
     return: list of postgresql types
     """
-    if len(l) > 0 : 
+    if len(l) > 0:
         columns = l[0].keys()
         nb_rows = len(l)
         return_list = []
@@ -86,12 +86,12 @@ def fill_table(cursor, table, content):
                 map(
                     lambda column: f"'{row[column]}'"
                     if type(row[column] == "str")
-                    else f"{row[column]}",
+                    else f"{row[column] if row[column] != float('NaN') else None}",
                     row.keys(),
                 )
             )
         )
-        cursor.execute(f"INSERT INTO \"{table}\" ({columns_sql}) VALUES ({values_sql})")
+        cursor.execute(f'INSERT INTO "{table}" ({columns_sql}) VALUES ({values_sql})')
 
 
 def get_data_from_csv(filepath):
@@ -108,7 +108,6 @@ def get_data_from_csv_dict(csv_files):
     """
     data = {}
     for table, filepath in csv_files.items():
-
 
         data[table] = get_data_from_csv(filepath)
     return data
