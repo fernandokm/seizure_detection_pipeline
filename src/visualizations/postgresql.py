@@ -128,6 +128,31 @@ def push_postgresql_data_from_pd_dataframe(
     push_postgresql_data({table_name: data}, host, database, username, password, port)
 
 
+def query(
+    host: str,
+    database: str,
+    username: str,
+    password: str,
+    query: str,
+    port: int = 5432,
+):
+    """
+    Query postgresql
+    """
+    conn = psycopg2.connect(
+        host=host, database=database, user=username, password=password, port=port
+    )
+    try:
+        with conn.cursor() as curs:
+            curs.execute(query)
+            return curs.fetchall()
+    except Exception as e:
+        conn.rollback()
+        print(e)
+    finally:
+        conn.close()
+
+
 if __name__ == "__main__":
 
     import pandas as pd

@@ -1,7 +1,11 @@
+import random
 from influxdb_client import InfluxDBClient
 import os
 import json
-from .log import log
+from .postgresql import query as postgresql_query
+
+# from .log import log
+from itertools import islice
 
 IDB_HOST = "localhost"
 IDB_PORT = os.environ.get("INFLUXDB_PORT")
@@ -11,6 +15,8 @@ IDB_DATABASE = os.environ.get("INFLUXDB_DATABASE")
 
 PATIENT_DASHBOARD = "./conf/provisioning/dashboards/patient.json"
 HOME_DASHBOARD = "./conf/provisioning/dashboards/main.json"
+PATIENT_NAMES_LINES = 18239
+PATIENT_NAMES_FILE = os.path.join(os.path.dirname(__file__), "names.txt")
 
 
 def generate_home_dashboard(
@@ -46,67 +52,6 @@ def generate_home_dashboard(
     write_dashboard(home_dashboard, filepath)
 
 
-def generate_confusion_matrix():
-    """
-        #main {
-    width: 100%;
-    height: 100%;
-    }
-
-    .line {
-    display: flex;
-    justify-content: center;
-    width:100%;
-    height: 50%;
-    }
-    .line > div {
-    width: 50%;
-    text-align: center;
-    color: white;
-    display: flex;
-    justify-content:center;
-    align-items: center;
-    font-size: 1.7rem;
-    }
-    #square1 {
-    background: red;
-    }
-    #square2 {
-    background: blue;
-    }
-    #square3 {
-    background: yellow;
-    color: black
-    }
-
-    #square4 {
-    background: green;
-    }
-    """
-    """
-    <div id='main'>
-<div class='line'>
-<div id='square1'>
-96
-</div>
-<div id='square2'>
-1067
-</div>
-</div>
-<div class='line'>
-<div id='square3'>
-158 896
-</div>
-<div id='square4'>
-14 346
-</div>
-</div>
-</div>
-
-    """
-    pass
-
-
 def generate_links_pannel(links: list) -> str:
     return f"""
     <div class="panel-container">
@@ -132,17 +77,41 @@ def generate_patient_links(
     """
     links = []
     for start_time, end_time, patient_id in zip(start_times, end_times, patient_ids):
-        patient_label = f"Patient {patient_id}"
+        patient_label = generate_patient_label(patient_id)
         links.append(
-            f"<a href='/d/{patient_dashboard_uid}/patient?orgId=1&var-patient={patient_id}&from={start_time}&to={end_time}'>{patient_label}{generate_patient_subtitle()}</a>"
+            f"<a href='/d/{patient_dashboard_uid}/patient?orgId=1&var-patient={patient_id}&from={start_time}&to={end_time}'>{patient_label}{generate_patient_subtitle(patient_id)}</a>"
         )
     return links
 
 
-def generate_patient_subtitle() -> list:
-    return (
-        "<div class='session-subtitle'>x vraies Crises, prédictions justes à x%</div>"
+def generate_patient_subtitle(patient_id) -> list:
+    real_crises = postgresql_query(
+        host=os.environ.get("POSTGRES_HOST_URL"),
+        database=os.environ.get("POSTGRES_DATABASE"),
+        username=os.environ.get("POSTGRES_USER"),
+        password=os.environ.get("POSTGRES_PASSWORD"),
+        query=f"SELECT * FROM crises WHERE patient_id = {patient_id} AND type == 'real'",
     )
+    predicted_crises = postgresql_query(
+        host=os.environ.get("POSTGRES_HOST_URL"),
+        database=os.environ.get("POSTGRES_DATABASE"),
+        username=os.environ.get("POSTGRES_USER"),
+        password=os.environ.get("POSTGRES_PASSWORD"),
+        query=f"SELECT * FROM crises WHERE patient_id = {patient_id} AND type == 'predicted'",
+    )
+
+    return f"<div class='session-subtitle'> {len(real_crises)} vraies Crises, {len(predicted_crises)}</div>"
+
+
+def generate_patient_label(patient_id: int) -> str:
+    """
+    Generates a patient label with form "Name (id)"
+    """
+    l = random.randint(0, PATIENT_NAMES_LINES - 1)
+    with open(PATIENT_NAMES_FILE) as f:
+        skipped = islice(f, l, l + 1)
+        name = next(skipped).strip()
+    return f"{name} ({patient_id})"
 
 
 def get_influxdb_data(
