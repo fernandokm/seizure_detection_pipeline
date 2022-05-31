@@ -37,9 +37,9 @@ def generate_table(cursor, table, content):
     table: table name
     content: table content
     """
-    cursor.execute(f"DROP TABLE IF EXISTS {table}")
+    cursor.execute(f"DROP TABLE IF EXISTS \"{table}\"")
     columns_sql = ", ".join(format_sql_columns(content))
-    cursor.execute(f"CREATE TABLE {table} ({columns_sql})")
+    cursor.execute(f"CREATE TABLE \"{table}\" ({columns_sql})")
     fill_table(cursor, table, content)
 
 
@@ -88,7 +88,7 @@ def fill_table(cursor, table, content):
                 )
             )
         )
-        cursor.execute(f"INSERT INTO {table} ({columns_sql}) VALUES ({values_sql})")
+        cursor.execute(f"INSERT INTO \"{table}\" ({columns_sql}) VALUES ({values_sql})")
 
 
 def get_data_from_csv(filepath):
