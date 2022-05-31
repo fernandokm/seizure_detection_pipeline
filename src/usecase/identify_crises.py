@@ -115,19 +115,19 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
                 real_ranges = list(get_ranges(df_model['label'], target_val=1))
             real_it = Peekable(iter(real_ranges))
             pred_it = Peekable(iter(get_ranges(df_model['predicted_label'], target_val=1)))
-            real_start = real_end = pred_start = pred_end = -1
-            for interval, is_real in split_and_sort_crises(real_it, pred_it):
-                # add to lists
-                if is_real:
-                    real_start, real_end = interval
-                    real_crises.append(get_crisis(real_start, real_end))
-                else:
-                    pred_start, pred_end = interval
-                    pred_crises.append(get_crisis(pred_start, pred_end, model=model))
+            for real_interval, pred_interval in split_and_zip_crises(real_it, pred_it):
+                if real_interval is not None and not is_last_crisis(real_interval, real_crises):
+                    # if the real crisis is not already in the list, append it
+                    real_crises.append(get_crisis(*real_interval))
+                if pred_interval is not None and not is_last_crisis(pred_interval, pred_crises):
+                    # if the predicted crisis is not already in the list, append it
+                    pred_crises.append(get_crisis(*pred_interval, model=model))
 
                 # detect intersections
-                if real_start == -1 or pred_start == -1:
+                if real_interval is None or pred_interval is None:
                     continue
+                real_start, real_end = real_interval
+                pred_start, pred_end = pred_interval
                 intersection_start = max(real_start, pred_start)
                 intersection_end = min(real_end, pred_end)
                 intersection_duration = intersection_end - intersection_start
@@ -158,38 +158,94 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
     metrics_df.to_csv(os.path.join(output_folder, 'metrics.csv'), index=False)
 
 
-def split_and_sort_crises(real_it: Peekable[Interval], pred_it: Peekable[Interval]) \
-        -> Iterable[Tuple[Interval, bool]]:
+def is_last_crisis(crisis: Interval, crises_list: List[dict]) -> bool:
+    if not crises_list:
+        return False
+    last = crises_list[-1]
+    start, end = crisis
+    return last['start'] == start and last['end'] == end
+
+
+def split_and_zip_crises(real_it: Peekable[Interval], pred_it: Peekable[Interval]) \
+        -> Iterable[Tuple[Optional[Interval], Optional[Interval]]]:
+    if not real_it.has_next():
+        
+        return
+    elif not pred_it.has_next():
+        # If there are no predicted crisis, just yield the real ones
+        while real_it.has_next():
+            yield real_it.next(), None
+        return
+
+    # These variables will be properly initialized in the first iteration
+    # of the while loop. We initialize them now to indicate to linters
+    # that these variables are not unbound.
     real_start = real_end = pred_start = pred_end = -1
-    while real_it.has_next() or pred_it.has_next():
-        if real_it.has_next() and real_end < pred_end:
-            is_real = True
-        elif pred_it.has_next() and pred_end < real_end:
-            is_real = False
-        elif real_it.has_next():
-            is_real = True
+
+    # indicates whether we need to fetch a new real/predicted crisis
+    update_real = update_pred = True
+    while True:
+        if update_real:
+            if real_it.has_next():
+                # If there is another real crisis, get it
+                real_start, real_end = real_it.next()
+            else:
+                # Otherwise, yield the predicted ones and return
+                if not update_pred:
+                    yield None, (pred_start, pred_end)
+                while pred_it.has_next():
+                    yield None, pred_it.next()
+                return
+    
+        if update_pred:
+            if pred_it.has_next():
+                # If there is another predicted crisis, get it
+                pred_start, pred_end = pred_it.next()
+            else:
+                # Otherwise, yield the real ones and return
+                yield (real_start, real_end), None
+                while real_it.has_next():
+                    yield real_it.next(), None
+                return
+
+        # If we're here, then there are both real and predicted crises
+        update_real = update_pred = False
+        if real_end <= pred_start:
+            # the real crisis happens before the predicted one (no overlap)
+            yield (real_start, real_end), None
+            update_real = True
+        elif pred_end <= real_start:
+            # the predicted crisis happens before the real one (no overlap)
+            yield None, (pred_start, pred_end)
+            update_pred = True
+        elif real_start - pred_start > MAX_OVERPREDICTION:
+            # otherwise, there is overlap
+
+            # the prediction starts too early, so we split it into two parts:
+            # - the part of the prediction that's too early (yielded now)
+            # - the part that's ok (left for the next iteration)
+            yield None, (pred_start, real_start - MAX_OVERPREDICTION - 1)
+            pred_start = real_start - MAX_OVERPREDICTION
+        elif pred_end - real_end > MAX_OVERPREDICTION:
+            # the prediction ends too late, so we split it into two parts:
+            # - the part that's ok (yielded now)
+            # - the part of the prediction that's too late (left for the next iteration)
+            yield (real_start, real_end), (pred_start, real_end+MAX_OVERPREDICTION)
+            pred_start = real_end + MAX_OVERPREDICTION + 1
+            update_real = True
         else:
-            is_real = False
-
-        if is_real:
-            real_start, real_end = real_it.next()
-            yield (real_start, real_end), True
-        else:
-            pred_start, pred_end = pred_it.next()
-            for pred_start, pred_end in split_interval(pred_start, pred_end, real_start, real_end):
-                yield (pred_start, pred_end), False
-
-
-def split_interval(start, end, split_start, split_end) -> Iterable[Tuple[int, int]]:
-    if split_start - start > MAX_OVERPREDICTION and end >= split_start:
-        yield (start, split_start-1)
-        start = split_start
-    if end - split_end > MAX_OVERPREDICTION and start <= split_end:
-        yield (start, split_end)
-        yield (split_end+1, end)
-    else:
-        yield (start, end)
-
+            # otherwise, the prediction ends within the maximum allowed time
+            yield (real_start, real_end), (pred_start, pred_end)
+            # we advance only the crisis (real or predicted) which ends earlier,
+            # because the later crisis might still have other intersections
+            if pred_end < real_end and pred_it.has_next() and pred_it.peek()[0] < real_end:
+                # in this case, the next predicted crisis will intersect with the current real crisis,
+                # so we don't update the real crisis
+                update_pred = True
+            else:
+                # otherwise, we update both
+                # note that a predicted crisis can only intersect a single real crisis
+                update_real = update_pred = True
 
 def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_intersections: List[dict], model: str):
     tagged_crises = []
