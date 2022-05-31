@@ -477,7 +477,7 @@ def dag_grafana_pipeline():
 
         generate_home_dashboard(
             filepath=HOME_DASHBOARD,
-            host=os.environ.get("INFLUXDB_HOST"),
+            host=os.environ.get("INFLUXDB_HOST_URL"),
             port=os.environ.get("INFLUXDB_PORT"),
             database=os.environ.get("INFLUXDB_DATABASE"),
             retention_policy="autogen",

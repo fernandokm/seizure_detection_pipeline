@@ -178,7 +178,7 @@ def get_patients_ids(client: InfluxDBClient, bucket: str) -> list:
     v1.tagValues(bucket: "{bucket}", tag: "patient", predicate: (r) => true, start: -20y)"""
     query_api = client.query_api()
     r = query_api.query_stream(org="-", query=query)
-    patients_ids = [int(rec.values.get("_value", None)) for rec in r]
+    patients_ids = [rec.values.get("_value", None) for rec in r]
     return patients_ids
 
 
