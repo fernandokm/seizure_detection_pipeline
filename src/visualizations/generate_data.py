@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-# from src.visualizations import influxDB
+from src.visualizations import influxDB
 from src.visualizations import postgresql
 from src.visualizations.log import log
 
@@ -75,5 +75,5 @@ def generate_influxdb_data(edf_files: dict = {}, csv_files: dict = {}):
 if __name__ == "__main__":
     log("Starting execution")
     generate_postgresql_data(CSV_CRISES)
-    # generate_influxdb_data(EDF_SOURCES, CSV_SOURCES)
+    generate_influxdb_data(EDF_SOURCES, CSV_SOURCES)
     log("Execution finished")
