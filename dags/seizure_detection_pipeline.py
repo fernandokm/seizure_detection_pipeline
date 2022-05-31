@@ -466,7 +466,7 @@ def dag_grafana_pipeline():
     def t_generate_influxdb_data(parameters: dict) -> None:
         from src.visualizations.generate_data import generate_influxdb_data
 
-        generate_influxdb_data(edf_files=parameters["edf_sources"], csv_files={})
+        generate_influxdb_data(edf_files=parameters["edf_sources"], csv_files=parameters["csv_sources"])
 
     @task()
     def t_generate_dashboards(parameters: dict) -> None:
