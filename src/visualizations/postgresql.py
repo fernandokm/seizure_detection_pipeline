@@ -38,9 +38,11 @@ def generate_table(cursor, table, content):
     content: table content
     """
     cursor.execute(f"DROP TABLE IF EXISTS \"{table}\"")
-    columns_sql = ", ".join(format_sql_columns(content))
-    cursor.execute(f"CREATE TABLE \"{table}\" ({columns_sql})")
-    fill_table(cursor, table, content)
+    sql_columns_list = format_sql_columns(content)
+    if sql_columns_list is not None : 
+        columns_sql = ", ".join(sql_columns_list)
+        cursor.execute(f"CREATE TABLE \"{table}\" ({columns_sql})")
+        fill_table(cursor, table, content)
 
 
 def format_sql_columns(l):
@@ -49,24 +51,25 @@ def format_sql_columns(l):
     l - list of dicts
     return: list of postgresql types
     """
-    columns = l[0].keys()
-    nb_rows = len(l)
-    return_list = []
-    for column in columns:
-        i = 0
-        while i < nb_rows - 1 or l[i][column] == float("NaN"):
-            i += 1
-        if i >= nb_rows:
-            return_list.append(f"{column} varchar(255)")
-        elif isinstance(l[i][column], datetime):
-            return_list.append(f"{column} timestamp")
-        elif isinstance(l[i][column], float):
-            return_list.append(f"{column} double precision")
-        elif isinstance(l[i][column], int):
-            return_list.append(f"{column} integer")
-        else:
-            return_list.append(f"{column} varchar(255)")
-    return return_list
+    if len(l) > 0 : 
+        columns = l[0].keys()
+        nb_rows = len(l)
+        return_list = []
+        for column in columns:
+            i = 0
+            while i < nb_rows - 1 or l[i][column] == float("NaN"):
+                i += 1
+            if i >= nb_rows:
+                return_list.append(f"{column} varchar(255)")
+            elif isinstance(l[i][column], datetime):
+                return_list.append(f"{column} timestamp")
+            elif isinstance(l[i][column], float):
+                return_list.append(f"{column} double precision")
+            elif isinstance(l[i][column], int):
+                return_list.append(f"{column} integer")
+            else:
+                return_list.append(f"{column} varchar(255)")
+        return return_list
 
 
 def fill_table(cursor, table, content):
@@ -105,6 +108,8 @@ def get_data_from_csv_dict(csv_files):
     """
     data = {}
     for table, filepath in csv_files.items():
+
+
         data[table] = get_data_from_csv(filepath)
     return data
 
