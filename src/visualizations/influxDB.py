@@ -8,6 +8,7 @@ from pyedflib import EdfReader
 import rx
 import datetime
 from numpy import float64
+import dateutil.parser
 
 
 def push_influxdb_data(
@@ -148,18 +149,11 @@ def to_nanoseconds(date_time: Any, mult_to_seconds=1):
     date_time: can be str (int seconds timestamp), str (DD-MM-YYYY HH:MM:SS.m), datetime, int or float (in seconds)
     """
     mult = 1e9 * mult_to_seconds
-    print(date_time)
-    print(type(date_time))
     if type(date_time) == str:
         try:
             return int(float(date_time) * mult)
         except:
-            return int(
-                datetime.datetime.strptime(
-                    date_time, "%Y-%m-%d %H:%M:%S.%f"
-                ).timestamp()
-                * 1e9
-            )
+            return int(dateutil.parser.parse(date_time).timestamp() * mult)
     elif type(date_time) in [int, float, float64]:
         return int(date_time * mult)
     elif type(date_time) == datetime.datetime:
