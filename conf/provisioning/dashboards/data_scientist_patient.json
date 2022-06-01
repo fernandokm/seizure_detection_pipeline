@@ -17,7 +17,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 9,
-  "iteration": 1654091885608,
+  "iteration": 1654093494216,
   "links": [
     {
       "icon": "dashboard",
@@ -289,7 +289,7 @@
       "type": "ae3e-plotly-panel"
     },
     {
-      "datasource": "Postgres",
+      "datasource": "aura-influxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -307,78 +307,37 @@
         "config": {
           "displayModeBar": false
         },
-        "data": [
-          {
-            "line": {
-              "color": "rgba(0.3, 0.74, 0.8, 1)",
-              "width": 2
-            },
-            "mode": "markers",
-            "type": "scatter"
-          }
-        ],
-        "layout": {
-          "font": {
-            "color": "darkgrey"
-          },
-          "margin": {
-            "b": 30,
-            "t": 10
-          },
-          "paper_bgcolor": "rgba(0,0,0,0)",
-          "plot_bgcolor": "rgba(0,0,0,0)",
-          "xaxis": {
-            "autorange": true,
-            "range": [
-              21.321562054565703,
-              214.2234629454343
-            ],
-            "title": {
-              "text": "max_hr"
-            },
-            "type": "linear"
-          },
-          "yaxis": {
-            "autorange": true,
-            "range": [
-              -2.1347296708993975,
-              33.5856806908994
-            ],
-            "title": {
-              "text": "lf_lh_ratio"
-            },
-            "type": "linear"
-          }
-        },
+        "data": "",
+        "layout": "",
         "onclick": "console.log(data)\nwindow.updateVariables({query:{'var-project':'test'}, partial: true})",
-        "script": "console.log(data)\nvar trace = {\n  x: data.series[0].fields[45].values.buffer,\n  y: data.series[0].fields[51].values.buffer\n};\n  \nreturn {data:[trace]};"
+        "script": "// This file is NOT used in Grafana, it is simply a copy paste of the Javascript script used in the correlation plot panel\n\n// The queries used to make it work are the following : \n\n// QUERY A : \n// SELECT /^$feature_1$/, /^$feature_2$/ FROM \"autogen\".\"features\" WHERE (\"patient\" =~ /^$patient$/) AND $timeFilter\n\nconsole.log(data)\n\nlet trace = {\n    x: data.series[0].fields[1].values.buffer,\n    y: data.series[0].fields[2].values.buffer,\n    marker: {\n        color: \"rgba(77, 189, 204, 1)\",\n        size: 3,\n    },\n    mode: \"markers\",\n    type: \"scatter\"\n};\n\nlet layout = {\n    margin: {\n        b: 30\n    },\n    xaxis: {\n        title: {\n            text: data.series[0].fields[1].name,\n        },\n        type : \"linear\",\n    },\n    yaxis: {\n        title: {\n            text: data.series[0].fields[2].name,\n        }\n    },\n  }\n\n  \nreturn {data:[trace], layout:layout};"
       },
       "pluginVersion": "7.3.4",
       "targets": [
         {
-          "format": "table",
-          "group": [],
-          "metricColumn": "none",
-          "queryType": "randomWalk",
+          "groupBy": [],
+          "measurement": "features",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT /^$feature_1$/, /^$feature_2$/ FROM \"autogen\".\"features\" WHERE (\"patient\" =~ /^$patient$/) AND $timeFilter",
           "rawQuery": true,
-          "rawSql": "SELECT * FROM shap_data",
           "refId": "A",
+          "resultFormat": "table",
           "select": [
             [
               {
                 "params": [
-                  "value"
+                  "/^$feature_2$/"
                 ],
-                "type": "column"
+                "type": "field"
               }
             ]
           ],
-          "timeColumn": "time",
-          "where": [
+          "tags": [
             {
-              "name": "$__timeFilter",
-              "params": [],
-              "type": "macro"
+              "key": "patient",
+              "operator": "=~",
+              "value": "/^$patient$/"
             }
           ]
         }
@@ -501,9 +460,9 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
-          "text": "max_hr",
-          "value": "max_hr"
+          "selected": true,
+          "text": "lf",
+          "value": "lf"
         },
         "datasource": "Postgres",
         "definition": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data'",
@@ -740,7 +699,7 @@
             "value": "mean_hr"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "max_hr",
             "value": "max_hr"
           },
@@ -755,7 +714,7 @@
             "value": "std_hr"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "lf",
             "value": "lf"
           },
@@ -829,9 +788,9 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
-          "text": "lf_hf_ratio",
-          "value": "lf_hf_ratio"
+          "selected": true,
+          "text": "hf",
+          "value": "hf"
         },
         "datasource": "Postgres",
         "definition": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data'",
@@ -840,7 +799,7 @@
         "includeAll": false,
         "label": "Secondary feature",
         "multi": false,
-        "name": "copy_of_feature_1",
+        "name": "feature_2",
         "options": [
           {
             "selected": false,
@@ -1088,7 +1047,7 @@
             "value": "lf"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "hf",
             "value": "hf"
           },
@@ -1098,7 +1057,7 @@
             "value": "vlf"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "lf_hf_ratio",
             "value": "lf_hf_ratio"
           },
@@ -1164,5 +1123,5 @@
   "timezone": "",
   "title": "Patient | Data scientist layout",
   "uid": "dstLyt",
-  "version": 8
+  "version": 9
 }
