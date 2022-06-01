@@ -3,6 +3,7 @@ from influxdb_client import InfluxDBClient
 import os
 import json
 from .postgresql import query as postgresql_query
+from .utils import split_patient_string
 
 # from .log import log
 from itertools import islice
@@ -89,21 +90,21 @@ def generate_patient_links(
 
 
 def generate_patient_subtitle(patient_id) -> list:
+    p_id, session = split_patient_string(patient_id)
     real_crises = postgresql_query(
         host=os.environ.get("POSTGRES_HOST_URL"),
         database=os.environ.get("POSTGRES_DATABASE"),
         username=os.environ.get("POSTGRES_USER"),
         password=os.environ.get("POSTGRES_PASSWORD"),
-        query=f"SELECT * FROM crises WHERE patient_id = {patient_id} AND type == 'real'",
+        query=f"SELECT * FROM crises WHERE patient_id = {int(p_id)} AND type = 'real' AND session_id = '{session}'",
     )
     predicted_crises = postgresql_query(
         host=os.environ.get("POSTGRES_HOST_URL"),
         database=os.environ.get("POSTGRES_DATABASE"),
         username=os.environ.get("POSTGRES_USER"),
         password=os.environ.get("POSTGRES_PASSWORD"),
-        query=f"SELECT * FROM crises WHERE patient_id = {patient_id} AND type == 'predicted'",
+        query=f"SELECT * FROM crises WHERE patient_id = '{int(p_id)}' AND type = 'predicted' AND session_id = '{session}'",
     )
-
     return f"<div class='session-subtitle'> {len(real_crises)} vraies Crises, {len(predicted_crises)}</div>"
 
 
