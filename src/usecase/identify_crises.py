@@ -8,6 +8,7 @@ import argparse
 import os
 import glob
 import sys
+import re
 from typing import Hashable, Iterable, Iterator, List, Optional, Tuple, Generic, TypeVar
 
 import numpy as np
@@ -62,7 +63,10 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
     models = set()
     for i, cons_file in enumerate(glob.iglob(os.path.join(cons_folder, "**/*.csv"), recursive=True)):
         cons_file_name = os.path.basename(cons_file)
-        patient_and_session_id = cons_file_name.replace('cons_', '').replace('.csv', '')
+        patient_and_session_id = re.fullmatch(r'cons_(\d+_s\d+_t\d+)(?:_t\d+)?.csv', cons_file_name)
+        if patient_and_session_id is None:
+            raise ValueError("Invalid file name: " + cons_file_name)
+        patient_and_session_id = patient_and_session_id.group(1)
         patient_id, session_id = patient_and_session_id.split('_', 1)
 
         df = pd.read_csv(cons_file, parse_dates=['timestamp'])
