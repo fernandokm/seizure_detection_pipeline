@@ -16,8 +16,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 9,
-  "iteration": 1654093494216,
+  "iteration": 1654094921491,
   "links": [
     {
       "icon": "dashboard",
@@ -101,14 +100,16 @@
           "measurement": "features",
           "orderByTime": "ASC",
           "policy": "autogen",
+          "query": "SELECT mean(/^$feature_1$/) FROM \"autogen\".\"features\" WHERE (\"patient\" =~ /^$patient$/) AND $timeFilter GROUP BY time(1s), \"patient\" fill(linear)",
           "queryType": "randomWalk",
+          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "max_hr"
+                  "/^$feature_1$/"
                 ],
                 "type": "field"
               },
@@ -433,7 +434,7 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "00004671_s007_t000",
           "value": "00004671_s007_t000"
         },
@@ -461,11 +462,11 @@
         "allValue": null,
         "current": {
           "selected": true,
-          "text": "lf",
-          "value": "lf"
+          "text": "median_nni",
+          "value": "median_nni"
         },
         "datasource": "Postgres",
-        "definition": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data'",
+        "definition": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data' AND column_name NOT  LIKE 'shap_values_%'",
         "error": null,
         "hide": 0,
         "includeAll": false,
@@ -473,151 +474,6 @@
         "multi": false,
         "name": "feature_1",
         "options": [
-          {
-            "selected": false,
-            "text": "shap_values_interval_index",
-            "value": "shap_values_interval_index"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_interval_start_time",
-            "value": "shap_values_interval_start_time"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_mean_nni",
-            "value": "shap_values_mean_nni"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_sdnn",
-            "value": "shap_values_sdnn"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_sdsd",
-            "value": "shap_values_sdsd"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_nni_50",
-            "value": "shap_values_nni_50"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_pnni_50",
-            "value": "shap_values_pnni_50"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_nni_20",
-            "value": "shap_values_nni_20"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_pnni_20",
-            "value": "shap_values_pnni_20"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_rmssd",
-            "value": "shap_values_rmssd"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_median_nni",
-            "value": "shap_values_median_nni"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_range_nni",
-            "value": "shap_values_range_nni"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_cvsd",
-            "value": "shap_values_cvsd"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_cvnni",
-            "value": "shap_values_cvnni"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_mean_hr",
-            "value": "shap_values_mean_hr"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_max_hr",
-            "value": "shap_values_max_hr"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_min_hr",
-            "value": "shap_values_min_hr"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_std_hr",
-            "value": "shap_values_std_hr"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_lf",
-            "value": "shap_values_lf"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_hf",
-            "value": "shap_values_hf"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_vlf",
-            "value": "shap_values_vlf"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_lf_hf_ratio",
-            "value": "shap_values_lf_hf_ratio"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_csi",
-            "value": "shap_values_csi"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_cvi",
-            "value": "shap_values_cvi"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_modified_csi",
-            "value": "shap_values_modified_csi"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_sampen",
-            "value": "shap_values_sampen"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_sd1",
-            "value": "shap_values_sd1"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_sd2",
-            "value": "shap_values_sd2"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_ratio_sd2_sd1",
-            "value": "shap_values_ratio_sd2_sd1"
-          },
           {
             "selected": false,
             "text": "index",
@@ -674,7 +530,7 @@
             "value": "rmssd"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "median_nni",
             "value": "median_nni"
           },
@@ -714,7 +570,7 @@
             "value": "std_hr"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "lf",
             "value": "lf"
           },
@@ -774,7 +630,7 @@
             "value": "timestamp"
           }
         ],
-        "query": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data'",
+        "query": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data' AND column_name NOT  LIKE 'shap_values_%'",
         "refresh": 0,
         "regex": "",
         "skipUrlSync": false,
@@ -789,11 +645,11 @@
         "allValue": null,
         "current": {
           "selected": true,
-          "text": "hf",
-          "value": "hf"
+          "text": "nni_50",
+          "value": "nni_50"
         },
         "datasource": "Postgres",
-        "definition": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data'",
+        "definition": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data' AND column_name NOT  LIKE 'shap_values_%'",
         "error": null,
         "hide": 0,
         "includeAll": false,
@@ -801,151 +657,6 @@
         "multi": false,
         "name": "feature_2",
         "options": [
-          {
-            "selected": false,
-            "text": "shap_values_interval_index",
-            "value": "shap_values_interval_index"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_interval_start_time",
-            "value": "shap_values_interval_start_time"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_mean_nni",
-            "value": "shap_values_mean_nni"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_sdnn",
-            "value": "shap_values_sdnn"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_sdsd",
-            "value": "shap_values_sdsd"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_nni_50",
-            "value": "shap_values_nni_50"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_pnni_50",
-            "value": "shap_values_pnni_50"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_nni_20",
-            "value": "shap_values_nni_20"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_pnni_20",
-            "value": "shap_values_pnni_20"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_rmssd",
-            "value": "shap_values_rmssd"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_median_nni",
-            "value": "shap_values_median_nni"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_range_nni",
-            "value": "shap_values_range_nni"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_cvsd",
-            "value": "shap_values_cvsd"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_cvnni",
-            "value": "shap_values_cvnni"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_mean_hr",
-            "value": "shap_values_mean_hr"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_max_hr",
-            "value": "shap_values_max_hr"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_min_hr",
-            "value": "shap_values_min_hr"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_std_hr",
-            "value": "shap_values_std_hr"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_lf",
-            "value": "shap_values_lf"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_hf",
-            "value": "shap_values_hf"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_vlf",
-            "value": "shap_values_vlf"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_lf_hf_ratio",
-            "value": "shap_values_lf_hf_ratio"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_csi",
-            "value": "shap_values_csi"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_cvi",
-            "value": "shap_values_cvi"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_modified_csi",
-            "value": "shap_values_modified_csi"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_sampen",
-            "value": "shap_values_sampen"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_sd1",
-            "value": "shap_values_sd1"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_sd2",
-            "value": "shap_values_sd2"
-          },
-          {
-            "selected": false,
-            "text": "shap_values_ratio_sd2_sd1",
-            "value": "shap_values_ratio_sd2_sd1"
-          },
           {
             "selected": false,
             "text": "index",
@@ -977,7 +688,7 @@
             "value": "sdsd"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "nni_50",
             "value": "nni_50"
           },
@@ -1047,7 +758,7 @@
             "value": "lf"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "hf",
             "value": "hf"
           },
@@ -1102,7 +813,7 @@
             "value": "timestamp"
           }
         ],
-        "query": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data'",
+        "query": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data' AND column_name NOT  LIKE 'shap_values_%'",
         "refresh": 0,
         "regex": "",
         "skipUrlSync": false,
@@ -1116,12 +827,12 @@
     ]
   },
   "time": {
-    "from": "2012-08-04T15:50:36.143Z",
-    "to": "2012-08-04T16:23:01.070Z"
+    "from": "2012-08-04T15:51:18.018Z",
+    "to": "2012-08-04T16:22:37.804Z"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Patient | Data scientist layout",
   "uid": "dstLyt",
-  "version": 9
+  "version": 11
 }
