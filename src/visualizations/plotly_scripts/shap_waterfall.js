@@ -10,9 +10,6 @@
 // Max number of feature to plot
 let max_feature_number = 10;
 
-// Base number for the waterfall plot
-let mean_important_number = 0.1;
-
 // argsort function found online :
 // let argsort = a => a.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]).map(i => i[1])
 // my modification to sort by absolute value in a descending order
@@ -50,9 +47,12 @@ function find_timestamps_of_crisis(timestamp, labels){
 
 console.log(data);
 // If there is no data (not the good time window for our patient for example)
-if (data.series.length == 0 ) {
+if (data.series.length < 2 ) {
     return {};
-}
+};
+
+// Base number for the waterfall plot
+let mean_important_number = data.series[1].fields[0].values.buffer[0];
 
 let all_fields = data.series[0].fields;
 let only_shap_value_fields = [];
