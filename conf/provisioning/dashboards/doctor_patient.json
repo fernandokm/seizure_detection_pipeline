@@ -1,0 +1,908 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": "-- Grafana --",
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "description": "Patient view",
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 0,
+    "id": 7,
+    "iteration": 1654009044943,
+    "links": [
+      {
+        "icon": "dashboard",
+        "tags": [],
+        "title": "Accueil",
+        "tooltip": "",
+        "type": "link",
+        "url": "/"
+      }
+    ],
+    "panels": [
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "aura-influxDB",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
+        },
+        "fill": 1,
+        "fillGradient": 0,
+        "gridPos": {
+          "h": 10,
+          "w": 16,
+          "x": 0,
+          "y": 0
+        },
+        "hiddenSeries": false,
+        "id": 8,
+        "legend": {
+          "avg": false,
+          "current": false,
+          "max": false,
+          "min": false,
+          "show": true,
+          "total": false,
+          "values": false
+        },
+        "lines": true,
+        "linewidth": 1,
+        "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
+        "percentage": false,
+        "pluginVersion": "7.3.4",
+        "pointradius": 2,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "alias": "ECG ($tag_patient)",
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "channel"
+                ],
+                "type": "tag"
+              },
+              {
+                "params": [
+                  "patient"
+                ],
+                "type": "tag"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "ecg",
+            "orderByTime": "ASC",
+            "policy": "autogen",
+            "queryType": "randomWalk",
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "Tension (uV)"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "patient",
+                "operator": "=~",
+                "value": "/^$patient$/"
+              }
+            ]
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeRegions": [],
+        "timeShift": null,
+        "title": "Electrocardiogram",
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "aliasColors": {},
+        "cacheTimeout": null,
+        "css_data": "",
+        "datasource": null,
+        "doInit": {},
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
+        },
+        "format": "short",
+        "gridPos": {
+          "h": 10,
+          "w": 8,
+          "x": 16,
+          "y": 0
+        },
+        "handleMetric": {},
+        "html_data": "<b> Nom : </b>Capucine Durepos\n<br>\n<b>Age :</b> 27 ans\n<br>\n<b>Type d'épilepsie :</b> ...\n<br>\n...\n\n",
+        "id": 10,
+        "interval": null,
+        "js_code": "",
+        "js_init_code": "",
+        "links": [],
+        "maxDataPoints": 3,
+        "nullPointMode": "connected",
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "queryType": "randomWalk",
+            "refId": "A"
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "Patient",
+        "type": "aidanmountford-html-panel"
+      },
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "aura-influxDB",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
+        },
+        "fill": 1,
+        "fillGradient": 0,
+        "gridPos": {
+          "h": 10,
+          "w": 16,
+          "x": 0,
+          "y": 10
+        },
+        "hiddenSeries": false,
+        "id": 2,
+        "legend": {
+          "avg": false,
+          "current": false,
+          "max": false,
+          "min": false,
+          "show": true,
+          "total": false,
+          "values": false
+        },
+        "lines": true,
+        "linewidth": 1,
+        "nullPointMode": "null",
+        "options": {
+          "alertThreshold": true
+        },
+        "percentage": false,
+        "pluginVersion": "7.3.4",
+        "pointradius": 2,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "alias": "Max heart rate ($tag_patient)",
+            "groupBy": [
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "patient"
+                ],
+                "type": "tag"
+              },
+              {
+                "params": [
+                  "linear"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "features",
+            "orderByTime": "ASC",
+            "policy": "autogen",
+            "queryType": "randomWalk",
+            "refId": "A",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "max_hr"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "patient",
+                "operator": "=~",
+                "value": "/^$patient$/"
+              }
+            ]
+          },
+          {
+            "alias": "Mean heart rate ($tag_patient)",
+            "groupBy": [
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "patient"
+                ],
+                "type": "tag"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "features",
+            "orderByTime": "ASC",
+            "policy": "autogen",
+            "refId": "B",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "mean_hr"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "patient",
+                "operator": "=~",
+                "value": "/^$patient$/"
+              }
+            ]
+          },
+          {
+            "alias": "Min heart rate ($tag_patient)",
+            "groupBy": [
+              {
+                "params": [
+                  "1s"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "patient"
+                ],
+                "type": "tag"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "measurement": "features",
+            "orderByTime": "ASC",
+            "policy": "autogen",
+            "refId": "C",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "min_hr"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": [
+              {
+                "key": "patient",
+                "operator": "=~",
+                "value": "/^$patient$/"
+              }
+            ]
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeRegions": [],
+        "timeShift": null,
+        "title": "Feature",
+        "tooltip": {
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ],
+        "yaxis": {
+          "align": false,
+          "alignLevel": null
+        }
+      },
+      {
+        "datasource": "Postgres",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 8,
+          "x": 16,
+          "y": 10
+        },
+        "id": 12,
+        "options": {
+          "config": {
+            "displayModeBar": false
+          },
+          "data": null,
+          "layout": {
+            "font": {
+              "color": "darkgrey"
+            },
+            "margin": {
+              "b": 20,
+              "l": 200,
+              "t": 30
+            },
+            "paper_bgcolor": "rgba(0,0,0,0)",
+            "plot_bgcolor": "rgba(0,0,0,0)"
+          },
+          "onclick": "console.log(data)\nwindow.updateVariables({query:{'var-project':'test'}, partial: true})",
+          "script": "console.log(data)\nvar x = data.series[0].fields[0].values.buffer;\nvar y = data.series[0].fields[1].values.buffer;\nvar timestamp = data.series[0].fields[2].values.buffer;\nvar colors = [];\n\n\nvar data_y = {};\nvar data_x = {}\nvar data_color = {};\nfor (var i = 0; i < x.length; i++) {\n    if (!(timestamp[i] in data_y)) {\n        data_y[timestamp[i]] = []\n        data_x[timestamp[i]] = []\n        data_color[timestamp[i]] = []\n    }\n    data_y[timestamp[i]].push(y[i])\n    data_x[timestamp[i]].push(x[i])\n\n    if (x[i] > 0) {\n        data_color[timestamp[i]].push(\"#23c43e\");\n    } else {\n        data_color[timestamp[i]].push(\"#eb4034\");\n    };\n};\n\nvar frames = [];\nvar unique_timestamps = Object.keys(data_y);\nfor (var i = 0; i < unique_timestamps.length; i++) {\n    frames.push({\n        name: unique_timestamps[i],\n        data: [{\n            x: data_x[unique_timestamps[i]],\n            y: data_y[unique_timestamps[i]],\n            marker: { color: data_color[unique_timestamps[i]] }\n        }],\n    })\n};\n\n\nvar sliderSteps = [];\nfor (var i = 0; i < unique_timestamps.length; i++) {\n    sliderSteps.push({\n        method: 'animate',\n        label: unique_timestamps[i],\n        args: [[unique_timestamps[i]], {\n            mode: 'immediate',\n            transition: { duration: 300 },\n            frame: { duration: 300, redraw: false },\n        }]\n    });\n}\n\nvar layout = {\n    sliders: [{\n        steps: sliderSteps\n    }]\n};\n\n\n\nvar trace = {\n    x: data_x[unique_timestamps[0]],\n    y: data_y[unique_timestamps[0]],\n    type: \"bar\",\n    orientation: \"h\",\n    marker: {\n        color: data_color[unique_timestamps[0]]\n    }\n};\n\nreturn {\n    data: [trace],\n    layout: layout,\n    frames: frames\n};\n"
+        },
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT\n  lime_coefficient,\n  feature_name,\n  timestamp\nFROM lime_barchart\nWHERE\n  patient_id = 1234 AND\n  session_id = 5678",
+            "refId": "A",
+            "select": [
+              [
+                {
+                  "params": [
+                    "lime_coefficient"
+                  ],
+                  "type": "column"
+                }
+              ]
+            ],
+            "table": "lime_barchart",
+            "timeColumn": "\"timestamp\"",
+            "timeColumnType": "timestamp",
+            "where": [
+              {
+                "name": "$__timeFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "Lime feature importance",
+        "type": "ae3e-plotly-panel"
+      }
+    ],
+    "refresh": false,
+    "schemaVersion": 26,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+      "list": [
+        {
+          "allValue": null,
+          "current": {
+            "selected": false,
+            "text": "00004671_s007_t000",
+            "value": "00004671_s007_t000"
+          },
+          "datasource": "aura-influxDB",
+          "definition": "",
+          "error": null,
+          "hide": 0,
+          "includeAll": false,
+          "label": "Patient",
+          "multi": false,
+          "name": "patient",
+          "options": [],
+          "query": "SHOW TAG VALUES WITH KEY=\"patient\"",
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "allValue": null,
+          "current": {
+            "selected": true,
+            "tags": [],
+            "text": [
+              "min_hr",
+              "max_hr",
+              "mean_hr"
+            ],
+            "value": [
+              "min_hr",
+              "max_hr",
+              "mean_hr"
+            ]
+          },
+          "datasource": "Postgres",
+          "definition": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data'",
+          "error": null,
+          "hide": 0,
+          "includeAll": false,
+          "label": null,
+          "multi": true,
+          "name": "Feature",
+          "options": [
+            {
+              "selected": false,
+              "text": "shap_values_interval_index",
+              "value": "shap_values_interval_index"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_interval_start_time",
+              "value": "shap_values_interval_start_time"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_mean_nni",
+              "value": "shap_values_mean_nni"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_sdnn",
+              "value": "shap_values_sdnn"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_sdsd",
+              "value": "shap_values_sdsd"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_nni_50",
+              "value": "shap_values_nni_50"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_pnni_50",
+              "value": "shap_values_pnni_50"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_nni_20",
+              "value": "shap_values_nni_20"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_pnni_20",
+              "value": "shap_values_pnni_20"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_rmssd",
+              "value": "shap_values_rmssd"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_median_nni",
+              "value": "shap_values_median_nni"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_range_nni",
+              "value": "shap_values_range_nni"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_cvsd",
+              "value": "shap_values_cvsd"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_cvnni",
+              "value": "shap_values_cvnni"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_mean_hr",
+              "value": "shap_values_mean_hr"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_max_hr",
+              "value": "shap_values_max_hr"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_min_hr",
+              "value": "shap_values_min_hr"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_std_hr",
+              "value": "shap_values_std_hr"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_lf",
+              "value": "shap_values_lf"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_hf",
+              "value": "shap_values_hf"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_vlf",
+              "value": "shap_values_vlf"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_lf_hf_ratio",
+              "value": "shap_values_lf_hf_ratio"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_csi",
+              "value": "shap_values_csi"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_cvi",
+              "value": "shap_values_cvi"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_modified_csi",
+              "value": "shap_values_modified_csi"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_sampen",
+              "value": "shap_values_sampen"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_sd1",
+              "value": "shap_values_sd1"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_sd2",
+              "value": "shap_values_sd2"
+            },
+            {
+              "selected": false,
+              "text": "shap_values_ratio_sd2_sd1",
+              "value": "shap_values_ratio_sd2_sd1"
+            },
+            {
+              "selected": false,
+              "text": "index",
+              "value": "index"
+            },
+            {
+              "selected": false,
+              "text": "interval_index",
+              "value": "interval_index"
+            },
+            {
+              "selected": false,
+              "text": "interval_start_time",
+              "value": "interval_start_time"
+            },
+            {
+              "selected": false,
+              "text": "mean_nni",
+              "value": "mean_nni"
+            },
+            {
+              "selected": false,
+              "text": "sdnn",
+              "value": "sdnn"
+            },
+            {
+              "selected": false,
+              "text": "sdsd",
+              "value": "sdsd"
+            },
+            {
+              "selected": false,
+              "text": "nni_50",
+              "value": "nni_50"
+            },
+            {
+              "selected": false,
+              "text": "pnni_50",
+              "value": "pnni_50"
+            },
+            {
+              "selected": false,
+              "text": "nni_20",
+              "value": "nni_20"
+            },
+            {
+              "selected": false,
+              "text": "pnni_20",
+              "value": "pnni_20"
+            },
+            {
+              "selected": false,
+              "text": "rmssd",
+              "value": "rmssd"
+            },
+            {
+              "selected": false,
+              "text": "median_nni",
+              "value": "median_nni"
+            },
+            {
+              "selected": false,
+              "text": "range_nni",
+              "value": "range_nni"
+            },
+            {
+              "selected": false,
+              "text": "cvsd",
+              "value": "cvsd"
+            },
+            {
+              "selected": false,
+              "text": "cvnni",
+              "value": "cvnni"
+            },
+            {
+              "selected": true,
+              "text": "mean_hr",
+              "value": "mean_hr"
+            },
+            {
+              "selected": true,
+              "text": "max_hr",
+              "value": "max_hr"
+            },
+            {
+              "selected": true,
+              "text": "min_hr",
+              "value": "min_hr"
+            },
+            {
+              "selected": false,
+              "text": "std_hr",
+              "value": "std_hr"
+            },
+            {
+              "selected": false,
+              "text": "lf",
+              "value": "lf"
+            },
+            {
+              "selected": false,
+              "text": "hf",
+              "value": "hf"
+            },
+            {
+              "selected": false,
+              "text": "vlf",
+              "value": "vlf"
+            },
+            {
+              "selected": false,
+              "text": "lf_hf_ratio",
+              "value": "lf_hf_ratio"
+            },
+            {
+              "selected": false,
+              "text": "csi",
+              "value": "csi"
+            },
+            {
+              "selected": false,
+              "text": "cvi",
+              "value": "cvi"
+            },
+            {
+              "selected": false,
+              "text": "modified_csi",
+              "value": "modified_csi"
+            },
+            {
+              "selected": false,
+              "text": "sampen",
+              "value": "sampen"
+            },
+            {
+              "selected": false,
+              "text": "sd1",
+              "value": "sd1"
+            },
+            {
+              "selected": false,
+              "text": "sd2",
+              "value": "sd2"
+            },
+            {
+              "selected": false,
+              "text": "ratio_sd2_sd1",
+              "value": "ratio_sd2_sd1"
+            },
+            {
+              "selected": false,
+              "text": "timestamp",
+              "value": "timestamp"
+            }
+          ],
+          "query": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data'",
+          "refresh": 0,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        }
+      ]
+    },
+    "time": {
+      "from": "2012-08-04T15:51:07.300Z",
+      "to": "2012-08-04T16:23:16.301Z"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Patient | Doctor layout",
+    "uid": "dctLyt",
+    "version": 55
+  }
