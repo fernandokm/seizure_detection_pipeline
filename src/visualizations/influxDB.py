@@ -65,6 +65,9 @@ def from_edf(
 def push_ecg_to_influxdb(ecg_filepath: str, **kwargs) -> None:
     loader = EdfLoader(ecg_filepath)
     channel_label = loader.get_ecg_candidate_channel()
+    if channel_label is None:
+        print('Missing ecg channel in file ' + ecg_filepath)
+        return
     channel = loader.channels.index(channel_label)
     data = rx.from_iterable(
         from_edf(

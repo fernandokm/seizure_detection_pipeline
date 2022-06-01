@@ -446,6 +446,7 @@ def dag_grafana_pipeline():
             "csv_crises": {
                 "crises": path.join(CRISES_FOLDER, "crises.csv"),
                 "metrics": path.join(CRISES_FOLDER, "metrics.csv"),
+                "session_metrics": path.join(CRISES_FOLDER, "session_metrics.csv"),
                 "intersections": path.join(CRISES_FOLDER, "intersections.csv"),
                 "sessions": path.join(CRISES_FOLDER, "sessions.csv"),
                 "tagged_crises": path.join(CRISES_FOLDER, "tagged_crises.csv"),
@@ -478,9 +479,7 @@ def dag_grafana_pipeline():
     def t_generate_postgresql_data(parameters: dict) -> None:
         from src.visualizations.generate_data import generate_postgresql_data
 
-        generate_postgresql_data(
-            {**parameters["csv_crises"], **parameters["csv_sources"]}
-        )
+        generate_postgresql_data(parameters["csv_crises"])
 
     @task()
     def t_generate_influxdb_data(parameters: dict) -> None:

@@ -162,24 +162,37 @@ def compute_metrics_and_crises(cons_folder: str = 'output/preds-v0_6',
             explainer = shap.TreeExplainer(loaded_models[model])
             global_metrics[model]['shap_expected_value'] = explainer.expected_value[1]
 
-    dicts_to_csv(real_crises+pred_crises, os.path.join(output_folder, 'crises.csv'), drop=['start', 'end'])
-    dicts_to_csv(crises_intersections, os.path.join(output_folder, 'intersections.csv'))
-    dicts_to_csv(sessions, os.path.join(output_folder, 'sessions.csv'))
-    dicts_to_csv(tagged_crises, os.path.join(output_folder, 'tagged_crises.csv'))
+    # We specify manually specify the columns for two reasons:
+    # 1) in order to drop some columns before saving the data
+    # 2) in order to ensure the column names are present even if there is no data
+    pd.DataFrame(real_crises + pred_crises,
+                 columns=['patient_id', 'session_id', 'time_start', 'time_end', 'type', 'model']) \
+        .to_csv(os.path.join(output_folder, 'crises.csv'), index=False)
 
-    global_metrics_df = pd.DataFrame([{'model': model, 'metric': metric, 'value': value}
-                                      for model, model_metrics in global_metrics.items()
-                                      for metric, value in model_metrics.items()])
-    global_metrics_df.to_csv(os.path.join(output_folder, 'metrics.csv'), index=False)
+    pd.DataFrame(crises_intersections,
+                 columns=['real_id', 'pred_id', 'duration_elements', 'model']) \
+        .to_csv(os.path.join(output_folder, 'intersections.csv'), index=False)
 
-    session_metrics_df = pd.DataFrame([{'patient_id': patient_id,
-                                        'session_id': session_id,
-                                        'metric': metric,
-                                        'value': value}
-                                      for (patient_id, session_id), metrics in session_metrics.items()
-                                      for metric, value in metrics.items()])
-    session_metrics_df.to_csv(os.path.join(output_folder, 'session_metrics.csv'), index=False)
+    pd.DataFrame(sessions,
+                 columns=['patient_id', 'session_id', 'cons_file', 'time_start', 'time_end']) \
+        .to_csv(os.path.join(output_folder, 'sessions.csv'), index=False)
 
+    pd.DataFrame(tagged_crises,
+                 columns=['real_id', 'pred_id', 'time_start', 'time_end', 'patient_id', 'session_id', 'overlap', 'classification', 'model']) \
+        .to_csv(os.path.join(output_folder, 'tagged_crises.csv'), index=False)
+
+    pd.DataFrame([{'model': model, 'metric': metric, 'value': value}
+                  for model, model_metrics in global_metrics.items()
+                  for metric, value in model_metrics.items()]) \
+        .to_csv(os.path.join(output_folder, 'metrics.csv'), index=False)
+
+    pd.DataFrame([{'patient_id': patient_id,
+                   'session_id': session_id,
+                   'metric': metric,
+                   'value': value}
+                  for (patient_id, session_id), metrics in session_metrics.items()
+                  for metric, value in metrics.items()]) \
+        .to_csv(os.path.join(output_folder, 'session_metrics.csv'), index=False)
 
 
 def update_with_derived_metrics(metrics: dict) -> None:
