@@ -3,18 +3,16 @@
 // The queries used to make it work are the following : 
 
 // QUERY A : 
-
-// SELECT
-//   *
-// FROM shap_data
+// SELECT * FROM "autogen"."features" WHERE ("patient" =~ /^$patient$/) AND $timeFilter
 
 
 
 // Max number of feature to plot
-var max_feature_number = 2
+var max_feature_number = 6
 
-// argsort function found online :
-var argsort = a => a.map((v, i) => [v, i]).sort().map(i => i[1])
+// argsort function found online and modified so that it sorts in descending order
+let argsort = a => a.map((v, i) => [v, i]).sort((a, b) => a[0] - b[0]).map(i => i[1])
+
 
 // Standard Normal variate using Box-Muller transform (also found online obviously)
 function randn_bm() {
@@ -178,60 +176,71 @@ function calculate_variance(shaps) {
 }
 
 console.log(data);
+if (data.series.length == 0) {
+    return {}
+}
 var all_fields = data.series[0].fields;
 var feature_name = "";
 var list_feature_names = [];
 var data_dict = {};
+
+// We retrieve the names of all the features which have their shap_values calculated
 for (var j = 0; j < all_fields.length; j++) {
     if (all_fields[j].name.substring(0, 11) == 'shap_values') {
-        feature_name = all_fields[j].name.substring(12);
+        feature_name = all_fields[j].name.substring(12); // substring(12) to remove 'shap_values_'
         data_dict[feature_name] = {};
         list_feature_names.push(feature_name);
     };
 };
 
+// Store in data_dict the shap values, the feature values and the variance of the shap values (we'll have to sort by this variance afterwards)
 for (var j = 0; j < all_fields.length; j++) {
+    // if the field contain the shap values
     if (all_fields[j].name.substring(0, 11) == 'shap_values') {
         feature_name = all_fields[j].name.substring(12)
         data_dict[feature_name]["shaps"] = all_fields[j].values.buffer
         data_dict[feature_name]["variance"] = calculate_variance(all_fields[j].values.buffer)
+    // if the field contain the feature values
     } else if (data_dict.hasOwnProperty(all_fields[j].name)) {
         feature_name = all_fields[j].name
         data_dict[feature_name]["values"] = all_fields[j].values.buffer
     }
 }
 
-
 // Sorting the features by decreasing order of variance
 var sorted_feature_names = list_feature_names.sort(function (first, second) {
     return data_dict[second].variance - data_dict[first].variance;
 });
 
+var final_number_of_plots = Math.min(max_feature_number, sorted_feature_names.length)
+
 // Getting x position of features name annotation
 var min_x_shaps_value = 0
 var max_x_shaps_value = 0
-for (i = 0; i < Math.min(max_feature_number, sorted_feature_names.length); i++) {
+for (i = 0; i < final_number_of_plots; i++) {
     if (max_x_shaps_value < Math.max(...data_dict[sorted_feature_names[i]]["shaps"])) {
-
         max_x_shaps_value = Math.max(...data_dict[sorted_feature_names[i]]["shaps"])
     }
     if (min_x_shaps_value > Math.min(...data_dict[sorted_feature_names[i]]["shaps"])) {
         min_x_shaps_value = Math.min(...data_dict[sorted_feature_names[i]]["shaps"])
     }
 }
+
 // Shap values are actually inverted when plotting so we take the 
 // negative of the max minus a small percentage of the range
 var x_annotation_pos = -1 * max_x_shaps_value - 0.1 * (max_x_shaps_value - min_x_shaps_value)
 
 var traces = []
 var annotations = []
-for (i = 0; i < Math.min(max_feature_number, sorted_feature_names.length); i++) {
-    traces.push(get_trace_for_one_feature(data_dict[sorted_feature_names[i]]["shaps"], data_dict[sorted_feature_names[i]]["values"], i + 1, (i == 0)))
+for (i = 0; i < final_number_of_plots; i++) {
+    // we want to have the plot with biggest variance at the top of our graph
+    j = final_number_of_plots - i
+    traces.push(get_trace_for_one_feature(data_dict[sorted_feature_names[i]]["shaps"], data_dict[sorted_feature_names[i]]["values"], j + 1, (i == 0)))
     annotations.push(
         {
             x: x_annotation_pos,
             xanchor: 'right',
-            y: i + 1,
+            y: j + 1,
             yanchor: 'center',
             text: sorted_feature_names[i],
             showarrow: false
