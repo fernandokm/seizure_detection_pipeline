@@ -6,6 +6,17 @@ import pandas as pd
 from typing import Generator
 
 
+class LazyCSVDataframe():
+    def __init__(self, filepath):
+        self.filepath = filepath
+    def get_data_from_csv(self):
+        """
+        Transforms data from csv to list of dicts for each line
+        """
+        return pd.read_csv(self.filepath).to_dict(orient="records")
+    def __call__(self):
+        return self.get_data_from_csv()
+
 def push_postgresql_data(
     data: dict, host: str, database: str, username: str, password: str, port: int = 5432
 ):
@@ -38,6 +49,8 @@ def generate_table(cursor, table, content):
     content: table content
     """
     cursor.execute(f'DROP TABLE IF EXISTS "{table}"')
+    if isinstance(content, LazyCSVDataframe):
+        content = content()
     sql_columns_list = format_sql_columns(content)
     if sql_columns_list is not None:
         columns_sql = ", ".join(sql_columns_list)
@@ -94,12 +107,7 @@ def fill_table(cursor, table, content):
         cursor.execute(f'INSERT INTO "{table}" ({columns_sql}) VALUES ({values_sql})')
 
 
-def get_data_from_csv(filepath):
-    """
-    Transforms data from csv to list of dicts for each line
-    """
-    df = pd.read_csv(filepath)
-    return df.to_dict(orient="records")
+
 
 
 def get_data_from_csv_dict(csv_files):
@@ -108,8 +116,7 @@ def get_data_from_csv_dict(csv_files):
     """
     data = {}
     for table, filepath in csv_files.items():
-
-        data[table] = get_data_from_csv(filepath)
+        data[table] = LazyCSVDataframe(filepath)
     return data
 
 
