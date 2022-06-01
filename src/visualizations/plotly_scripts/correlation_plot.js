@@ -7,6 +7,11 @@
 
 console.log(data)
 
+// in case there is no data
+if (data.series.length == 0) {
+    return {}
+}
+
 let trace = {
     x: data.series[0].fields[1].values.buffer,
     y: data.series[0].fields[2].values.buffer,

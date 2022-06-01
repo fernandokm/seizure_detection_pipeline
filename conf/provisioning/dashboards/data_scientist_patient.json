@@ -16,8 +16,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 9,
-  "iteration": 1654104133407,
+  "iteration": 1654108458908,
   "links": [
     {
       "icon": "dashboard",
@@ -171,18 +170,33 @@
       }
     },
     {
-      "aliasColors": {},
       "cacheTimeout": null,
-      "css_data": "",
-      "datasource": null,
+      "datasource": "Postgres",
       "doInit": {},
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {
+            "align": "center",
+            "displayMode": "auto",
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
-      "format": "short",
       "gridPos": {
         "h": 7,
         "w": 8,
@@ -190,25 +204,49 @@
         "y": 0
       },
       "handleMetric": {},
-      "html_data": "Accuracy : 0.91\n<br>\nRecall : 0.72\n<br>\nPrecision : 0.73\n<br>\nF1 score : 0.62\n<br>\nSpecificity : 0.4",
       "id": 4,
       "interval": null,
-      "js_code": "",
-      "js_init_code": "",
       "links": [],
       "maxDataPoints": 3,
-      "nullPointMode": "connected",
+      "options": {
+        "showHeader": false
+      },
       "pluginVersion": "7.3.4",
       "targets": [
         {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
           "queryType": "randomWalk",
-          "refId": "A"
+          "rawQuery": true,
+          "rawSql": "SELECT metric, value FROM session_metrics \nWHERE value != value + 1\nAND CONCAT(REPEAT('0', 8 - length(patient_id::varchar(255))), patient_id, '_', session_id) = '$patient'\n",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "lime_coefficient"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "lime_barchart",
+          "timeColumn": "\"timestamp\"",
+          "timeColumnType": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
         }
       ],
       "timeFrom": null,
       "timeShift": null,
       "title": "Statistics",
-      "type": "aidanmountford-html-panel"
+      "type": "table"
     },
     {
       "datasource": "-- Mixed --",
@@ -342,7 +380,7 @@
         "data": "",
         "layout": "",
         "onclick": "console.log(data)\nwindow.updateVariables({query:{'var-project':'test'}, partial: true})",
-        "script": "// This file is NOT used in Grafana, it is simply a copy paste of the Javascript script used in the correlation plot panel\n\n// The queries used to make it work are the following : \n\n// QUERY A : \n// SELECT /^$feature_1$/, /^$feature_2$/ FROM \"autogen\".\"features\" WHERE (\"patient\" =~ /^$patient$/) AND $timeFilter\n\nconsole.log(data)\n\nlet trace = {\n    x: data.series[0].fields[1].values.buffer,\n    y: data.series[0].fields[2].values.buffer,\n    marker: {\n        color: \"rgba(77, 189, 204, 1)\",\n        size: 3,\n    },\n    mode: \"markers\",\n    type: \"scatter\"\n};\n\nlet layout = {\n    margin: {\n        b: 30\n    },\n    xaxis: {\n        title: {\n            text: data.series[0].fields[1].name,\n        },\n        type : \"linear\",\n    },\n    yaxis: {\n        title: {\n            text: data.series[0].fields[2].name,\n        }\n    },\n  }\n\n  \nreturn {data:[trace], layout:layout};"
+        "script": "// This file is NOT used in Grafana, it is simply a copy paste of the Javascript script used in the correlation plot panel\n\n// The queries used to make it work are the following : \n\n// QUERY A : \n// SELECT /^$feature_1$/, /^$feature_2$/ FROM \"autogen\".\"features\" WHERE (\"patient\" =~ /^$patient$/) AND $timeFilter\n\nconsole.log(data)\n\n// in case there is no data\nif (data.series.length == 0) {\n    return {}\n}\n\nlet trace = {\n    x: data.series[0].fields[1].values.buffer,\n    y: data.series[0].fields[2].values.buffer,\n    marker: {\n        color: \"rgba(77, 189, 204, 1)\",\n        size: 3,\n    },\n    mode: \"markers\",\n    type: \"scatter\"\n};\n\nlet layout = {\n    margin: {\n        b: 30\n    },\n    xaxis: {\n        title: {\n            text: data.series[0].fields[1].name,\n        },\n        type : \"linear\",\n    },\n    yaxis: {\n        title: {\n            text: data.series[0].fields[2].name,\n        }\n    },\n  }\n\n  \nreturn {data:[trace], layout:layout};"
       },
       "pluginVersion": "7.3.4",
       "targets": [
@@ -465,7 +503,7 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "00004671_s007_t000",
           "value": "00004671_s007_t000"
         },
@@ -895,5 +933,5 @@
   "timezone": "",
   "title": "Patient | Data scientist layout",
   "uid": "dstLyt",
-  "version": 17
+  "version": 19
 }
