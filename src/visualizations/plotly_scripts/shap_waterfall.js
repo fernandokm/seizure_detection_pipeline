@@ -44,7 +44,6 @@ function find_timestamps_of_crisis(timestamp, labels){
         }
         
     };
-    console.log(begin_of_crisis, end_of_crisis)
     return [begin_of_crisis, end_of_crisis];
 }
 
@@ -103,32 +102,48 @@ function construct_shap_waterfall(data_x_i, data_y_i) {
     for (let i = 0; i < Math.min(inds.length, max_feature_number); i++) {
         ind = inds[i]
         // Plotly plots the first element at the bottom, and we want the biggest elements to be at the top
-        new_data_x_i.unshift(data_x_i[ind])  // unshift allows to push at the beginning of the array
-        new_data_y_i.unshift(data_y_i[ind])
+        new_data_x_i.unshift(data_x_i[ind]);  // unshift allows to push at the beginning of the array
+        new_data_y_i.unshift(data_y_i[ind]);
     };
-    let last_value = 0
+    let last_value = 0;
     for (let i = Math.min(inds.length, max_feature_number); i < Math.max(inds.length, max_feature_number); i++) {
-        last_value += data_x_i[inds[i]]
+        last_value += data_x_i[inds[i]];
     };
 
-    new_data_x_i.unshift(last_value)
-    new_data_y_i.unshift("")
+    new_data_x_i.unshift(last_value);
+    new_data_y_i.unshift("Other");
     // We want this regroupment to be at the bottom
-    return { new_data_x_i, new_data_y_i };
+    return [ new_data_x_i, new_data_y_i ];
 };
 
+function find_data_x_i_extrema(data_x_i){
+    let data_x_i_min = 1000;
+    let data_x_i_max = -1000;
+    let current_value = 0;
+    for (let i = 0; i < data_x_i.length ; i++) {
+        current_value += data_x_i[i]
+        if (current_value < data_x_i_min) {
+            data_x_i_min = current_value;
+        };
+        if (current_value > data_x_i_max) {
+            data_x_i_max = current_value;
+        };
+    };
+    return [data_x_i_min, data_x_i_max]
+};
 
 let frames = [];
 let x_range_min = 1000;
 let x_range_max = -1000;
 // for (let i = 0; i < 100; i++) {
 for (let i = 0; i < timestamp.length; i++) {
-    let { new_data_x_i, new_data_y_i } = construct_shap_waterfall(data_x[timestamp[i]], data_y[timestamp[i]]);
-    if (Math.max(...new_data_x_i) > x_range_max) {
-        x_range_max = Math.max(...new_data_x_i)
+    let [ new_data_x_i, new_data_y_i ] = construct_shap_waterfall(data_x[timestamp[i]], data_y[timestamp[i]]);
+    let [data_x_i_min, data_x_i_max] = find_data_x_i_extrema(new_data_x_i)
+    if (data_x_i_max > x_range_max) {
+        x_range_max = data_x_i_max
     };
-    if (Math.min(...new_data_x_i) < x_range_min) {
-        x_range_min = Math.min(...new_data_x_i)
+    if (data_x_i_min < x_range_min) {
+        x_range_min = data_x_i_min
     }; 
     frames.push({
         name: timestamp[i],
@@ -227,7 +242,7 @@ let layout = {
     xaxis: { range: [x_range_min - 0.1 * (x_range_max - x_range_min) + mean_important_number, x_range_max + 0.1 * (x_range_max - x_range_min) + mean_important_number] }
 };
 
-let { new_data_x_i, new_data_y_i } = construct_shap_waterfall(data_x[timestamp[0]], data_y[timestamp[0]])
+let [ new_data_x_i, new_data_y_i ] = construct_shap_waterfall(data_x[timestamp[0]], data_y[timestamp[0]])
 let relative = []
 for (let i = 0; i < new_data_x_i.length; i++) {
     relative.push("relative")
