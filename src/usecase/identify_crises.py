@@ -5,6 +5,7 @@ copyright (c) 2021 association aura
 spdx-license-identifier: gpl-3.0
 """
 import argparse
+from collections import defaultdict
 import os
 import glob
 import sys
@@ -59,7 +60,8 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
     pred_crises = []
     sessions = []
     crises_intersections = []
-    metrics = {}
+    global_metrics = defaultdict(lambda: {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0})
+    session_metrics = defaultdict(lambda: {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0})
     models = set()
     for i, cons_file in enumerate(glob.iglob(os.path.join(cons_folder, "**/*.csv"), recursive=True)):
         cons_file_name = os.path.basename(cons_file)
@@ -101,17 +103,19 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
             df_model = df[df['model'] == model]
 
             df_preds = df_model.dropna(subset=['label', 'predicted_label'])
-            metrics[model] = {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0}
             if not df_preds.empty:
                 tn, fp, fn, tp = confusion_matrix(df_preds['label'], df_preds['predicted_label'], labels=[0, 1]).ravel()
-                metrics[model]['tn'] += tn
-                metrics[model]['fp'] += fp
-                metrics[model]['fn'] += fn
-                metrics[model]['tp'] += tp
-                
-            safe_div = lambda x, y: x/y if y != 0 else np.nan
-            metrics[model]['sensitivity'] = safe_div(metrics[model]['tp'], metrics[model]['tp'] + metrics[model]['fn'])
-            metrics[model]['specitivity'] = safe_div(metrics[model]['tn'], metrics[model]['tn'] + metrics[model]['fp'])
+                session_metrics[(patient_id, session_id)] = {
+                    'tn': tn,
+                    'fp': fp,
+                    'fn': fn,
+                    'tp': tp,
+                }
+            global_metrics.setdefault(model, defaultdict(int))
+            for metric, val in session_metrics[(patient_id, session_id)].items():
+                global_metrics[model][metric] += val
+
+            update_with_derived_metrics(session_metrics[(patient_id, session_id)])
 
             # Initilize real_ranges only for the first model
             # Other models should use the same data, so we can just reuse the same real_ranges
@@ -146,9 +150,10 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
 
     tagged_crises = []
     for model in models:
+        update_with_derived_metrics(global_metrics[model])
         tagged_crises_for_model, crises_metrics_for_model = \
             compute_metrics(real_crises, pred_crises, crises_intersections, model=model)
-        metrics[model].update(crises_metrics_for_model)
+        global_metrics[model].update(crises_metrics_for_model)
         tagged_crises += tagged_crises_for_model
 
     dicts_to_csv(real_crises+pred_crises, os.path.join(output_folder, 'crises.csv'), drop=['start', 'end'])
@@ -156,10 +161,32 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
     dicts_to_csv(sessions, os.path.join(output_folder, 'sessions.csv'))
     dicts_to_csv(tagged_crises, os.path.join(output_folder, 'tagged_crises.csv'))
 
-    metrics_df = pd.DataFrame([{'model': model, 'metric': metric, 'value': value}
-                               for model, model_metrics in metrics.items()
-                               for metric, value in model_metrics.items()])
-    metrics_df.to_csv(os.path.join(output_folder, 'metrics.csv'), index=False)
+    global_metrics_df = pd.DataFrame([{'model': model, 'metric': metric, 'value': value}
+                                      for model, model_metrics in global_metrics.items()
+                                      for metric, value in model_metrics.items()])
+    global_metrics_df.to_csv(os.path.join(output_folder, 'metrics.csv'), index=False)
+
+    session_metrics_df = pd.DataFrame([{'patient_id': patient_id,
+                                        'session_id': session_id,
+                                        'metric': metric,
+                                        'value': value}
+                                      for (patient_id, session_id), metrics in session_metrics.items()
+                                      for metric, value in metrics.items()])
+    session_metrics_df.to_csv(os.path.join(output_folder, 'session_metrics.csv'), index=False)
+
+
+
+def update_with_derived_metrics(metrics: dict) -> None:
+    safe_div = lambda x, y: x/y if y != 0 else np.nan
+    tp = metrics['tp']
+    tn = metrics['tn']
+    fn = metrics['fn']
+    fp = metrics['fp']
+    metrics['specitivity'] = safe_div(tn, tn + fp)
+    metrics['precision'] = safe_div(tp, tp + fp)
+    metrics['recall'] = safe_div(tp, tp + fn) # i.e. sensitivity
+    metrics['f1'] = 2 * safe_div(metrics['precision'] * metrics['recall'],
+                                 metrics['precision'] + metrics['recall'])
 
 
 def is_last_crisis(crisis: Interval, crises_list: List[dict]) -> bool:
