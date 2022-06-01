@@ -105,7 +105,7 @@ def generate_patient_subtitle(patient_id) -> list:
         password=os.environ.get("POSTGRES_PASSWORD"),
         query=f"SELECT * FROM crises WHERE patient_id = '{int(p_id)}' AND type = 'predicted' AND session_id = '{session}'",
     )
-    return f"<div class='session-subtitle'> {len(real_crises)} vraies Crises, {len(predicted_crises)}</div>"
+    return f"<div class='session-subtitle'> {len(real_crises)} vraies crises, {len(predicted_crises)} crises prédites</div>"
 
 
 def generate_patient_label(patient_id: int) -> str:
