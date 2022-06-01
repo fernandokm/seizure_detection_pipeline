@@ -198,12 +198,14 @@ for (let i = 0; i < begin_of_predicted_crisis.length; i++) {
     });
 };
 
+
 let layout = {
     sliders: [{
         steps: sliderSteps
     }],
     updatemenus: [{
-        type: 'buttons', 
+        // type: 'buttons', 
+        type : 'dropdown',
         showactive: false,
         x : -0.5,
         xanchor: 'center',
@@ -211,7 +213,8 @@ let layout = {
         buttons: real_crisis_buttons_beginning
       },
       {
-        type: 'buttons',
+        // type: 'buttons',
+        type : 'dropdown',
         showactive: false,
         x : -0.3,
         xanchor: 'center',
