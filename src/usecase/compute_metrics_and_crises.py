@@ -10,11 +10,12 @@ import os
 import glob
 import sys
 import re
-from typing import Hashable, Iterable, Iterator, List, Optional, Tuple, Generic, TypeVar
+from typing import Any, Dict, Hashable, Iterable, Iterator, List, Optional, Tuple, Generic, TypeVar
 
 import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix
+import shap
 
 
 sys.path.append('.')
@@ -53,8 +54,9 @@ class Peekable(Generic[T]):
             return False
 
 
-def identify_crises(cons_folder: str = 'output/preds-v0_6',
-                    output_folder: str = 'output/crises-v0_6'):
+def compute_metrics_and_crises(cons_folder: str = 'output/preds-v0_6',
+                               output_folder: str = 'output/crises-v0_6',
+                               loaded_models: Optional[Dict[str, Any]] = None):
     os.makedirs(output_folder, exist_ok=True)
     real_crises = []
     pred_crises = []
@@ -155,6 +157,10 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
             compute_metrics(real_crises, pred_crises, crises_intersections, model=model)
         global_metrics[model].update(crises_metrics_for_model)
         tagged_crises += tagged_crises_for_model
+
+        if loaded_models is not None and model in loaded_models:
+            explainer = shap.TreeExplainer(loaded_models[model])
+            global_metrics[model]['shap_expected_value'] = explainer.expected_value[1]
 
     dicts_to_csv(real_crises+pred_crises, os.path.join(output_folder, 'crises.csv'), drop=['start', 'end'])
     dicts_to_csv(crises_intersections, os.path.join(output_folder, 'intersections.csv'))
@@ -365,7 +371,7 @@ def dicts_to_csv(dicts: List[dict], path: str, drop: List[Hashable] = []):
     df.to_csv(path, index=False)
 
 
-def parse_identify_crises_args(
+def parse_compute_metrics_and_crises_args(
         args_to_parse: List[str]) -> argparse.Namespace:
     """
     Parse arguments for adaptable input.
@@ -392,6 +398,6 @@ def parse_identify_crises_args(
 
 
 if __name__ == '__main__':
-    args = parse_identify_crises_args(sys.argv[1:])
+    args = parse_compute_metrics_and_crises_args(sys.argv[1:])
     args_dict = convert_args_to_dict(args)
-    identify_crises(**args_dict)
+    compute_metrics_and_crises(**args_dict)
