@@ -16,12 +16,12 @@ from src.usecase.compute_hrvanalysis_features import FEATURES_KEY_TO_INDEX
 
 def explanation_pipeline(models, db):
     model_columns = list(FEATURES_KEY_TO_INDEX.keys())
-    shap_columns = [0]*len(model_columns)
-    lime_columns = [0]*len(model_columns)
-    lime_table = np.full((db.shape[0], len(model_columns)), np.nan)
+    shap_columns = ['']*len(model_columns)
+    lime_columns = ['']*(2*len(model_columns))
     for i in range(len(model_columns)):
         shap_columns[i] = "shap_values_"+model_columns[i]
-        lime_columns[i] = "lime_values_"+model_columns[i]
+        lime_columns[2*i] = "lime_string_"+model_columns[i]
+        lime_columns[2*i+1] = "lime_values_"+model_columns[i]
     db.loc[:, shap_columns] = np.nan
     db.loc[:, lime_columns] = np.nan
     for model_name, model in models.items():
@@ -46,12 +46,14 @@ def explanation_pipeline(models, db):
             if (prev_label != 1 and row['label'] == 1) or (prev_pred_label != 1 and row['predicted_label'] == 1):
                 exp = explainer_lime.explain_instance(
                     sample, model.predict_proba, labels=(0, 1), num_features=len(model_columns), num_samples=2000)
-                for j in range(len(model_columns)):
-                    lime_table[i, j] = exp.as_list()[j][1]
+                for j, weight in exp.as_map()[1]:
+                    feature_name = exp.domain_mapper.feature_names[j]
+                    discretized_feature = exp.domain_mapper.discretized_feature_names[j]
+                    db.loc[db.index[i], f'lime_string_{feature_name}'] = discretized_feature
+                    db.loc[db.index[i], f'lime_values_{feature_name}'] = weight
             prev_label = row['label']
             prev_pred_label = row['predicted_label']
         print('Computed lime explanation for model', model_name)
-    db.loc[:, lime_columns] = lime_table
 
 
 def explanation_pipeline_cli(model_name, db_name, output_file):
