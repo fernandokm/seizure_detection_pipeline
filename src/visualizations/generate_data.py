@@ -60,6 +60,7 @@ def generate_influxdb_data(edf_files: dict = {}, csv_files: dict = {}):
             password=IDB_PASSWORD,
             database=IDB_DATABASE,
         )
+        print(f'Pushed ecg for {patient}')
     for patient, file in csv_files.items():
         influxDB.push_csv_features_to_influxdb(
             file,
@@ -70,6 +71,7 @@ def generate_influxdb_data(edf_files: dict = {}, csv_files: dict = {}):
             password=IDB_PASSWORD,
             database=IDB_DATABASE,
         )
+        print(f'Pushed csv file for {patient}')
 
 
 if __name__ == "__main__":

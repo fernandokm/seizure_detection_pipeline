@@ -34,6 +34,7 @@ def push_postgresql_data(
             for table, content in data.items():
                 generate_table(curs, table, content)
                 conn.commit()
+                print(f'Generated table "{table}"')
     except Exception as e:
         conn.rollback()
         print(e)
