@@ -171,9 +171,22 @@ function calculate_variance(shaps) {
     var result = 0
     for (i = 0; i < shaps.length; i++) {
         result += Math.abs(shaps[i])
-    }
+    };
     return result
-}
+};
+
+// Sometimes the beginning of the shap fields can have null values. (because some features are calculated 
+// on the past minute or so, they thus don't have a value for the first 60 seconds)
+// Lukily the index at which the last null is is the same for all shap values fields, so we use any shap
+// value field to find this index. Then we will slide all shap_values and feature_values fields with this index
+function find_first_not_null_index(shap_values){
+    for (let i = 0; i < shap_values.length; i++){
+        if (shap_values[i] != null) {
+            return i
+        };
+    };
+};
+
 
 console.log(data);
 if (data.series.length == 0) {
@@ -183,10 +196,14 @@ var all_fields = data.series[0].fields;
 var feature_name = "";
 var list_feature_names = [];
 var data_dict = {};
+let first_not_null_index = -1 
 
 // We retrieve the names of all the features which have their shap_values calculated
 for (var j = 0; j < all_fields.length; j++) {
     if (all_fields[j].name.substring(0, 11) == 'shap_values') {
+        if (first_not_null_index == -1) {
+            first_not_null_index = find_first_not_null_index(all_fields[j].values.buffer)
+        }
         feature_name = all_fields[j].name.substring(12); // substring(12) to remove 'shap_values_'
         data_dict[feature_name] = {};
         list_feature_names.push(feature_name);
@@ -198,12 +215,12 @@ for (var j = 0; j < all_fields.length; j++) {
     // if the field contain the shap values
     if (all_fields[j].name.substring(0, 11) == 'shap_values') {
         feature_name = all_fields[j].name.substring(12)
-        data_dict[feature_name]["shaps"] = all_fields[j].values.buffer
-        data_dict[feature_name]["variance"] = calculate_variance(all_fields[j].values.buffer)
+        data_dict[feature_name]["shaps"] = all_fields[j].values.buffer.slice(first_not_null_index)
+        data_dict[feature_name]["variance"] = calculate_variance(all_fields[j].values.buffer.slice(first_not_null_index))
     // if the field contain the feature values
     } else if (data_dict.hasOwnProperty(all_fields[j].name)) {
         feature_name = all_fields[j].name
-        data_dict[feature_name]["values"] = all_fields[j].values.buffer
+        data_dict[feature_name]["values"] = all_fields[j].values.buffer.slice(first_not_null_index)
     }
 }
 
