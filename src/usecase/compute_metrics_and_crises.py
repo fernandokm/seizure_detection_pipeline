@@ -5,14 +5,17 @@ copyright (c) 2021 association aura
 spdx-license-identifier: gpl-3.0
 """
 import argparse
+from collections import defaultdict
 import os
 import glob
 import sys
-from typing import Hashable, Iterable, Iterator, List, Optional, Tuple, Generic, TypeVar
+import re
+from typing import Any, Dict, Hashable, Iterable, Iterator, List, Optional, Tuple, Generic, TypeVar
 
 import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix
+import shap
 
 
 sys.path.append('.')
@@ -51,18 +54,23 @@ class Peekable(Generic[T]):
             return False
 
 
-def identify_crises(cons_folder: str = 'output/preds-v0_6',
-                    output_folder: str = 'output/crises-v0_6'):
+def compute_metrics_and_crises(cons_folder: str = 'output/preds-v0_6',
+                               output_folder: str = 'output/crises-v0_6',
+                               loaded_models: Optional[Dict[str, Any]] = None):
     os.makedirs(output_folder, exist_ok=True)
     real_crises = []
     pred_crises = []
     sessions = []
     crises_intersections = []
-    metrics = {}
+    global_metrics = defaultdict(lambda: {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0})
+    session_metrics = defaultdict(lambda: {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0})
     models = set()
     for i, cons_file in enumerate(glob.iglob(os.path.join(cons_folder, "**/*.csv"), recursive=True)):
         cons_file_name = os.path.basename(cons_file)
-        patient_and_session_id = cons_file_name.replace('cons_', '').replace('.csv', '')
+        patient_and_session_id = re.fullmatch(r'cons_(\d+_s\d+_t\d+)(?:_t\d+)?.csv', cons_file_name)
+        if patient_and_session_id is None:
+            raise ValueError("Invalid file name: " + cons_file_name)
+        patient_and_session_id = patient_and_session_id.group(1)
         patient_id, session_id = patient_and_session_id.split('_', 1)
 
         df = pd.read_csv(cons_file, parse_dates=['timestamp'])
@@ -97,17 +105,19 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
             df_model = df[df['model'] == model]
 
             df_preds = df_model.dropna(subset=['label', 'predicted_label'])
-            metrics[model] = {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0}
             if not df_preds.empty:
                 tn, fp, fn, tp = confusion_matrix(df_preds['label'], df_preds['predicted_label'], labels=[0, 1]).ravel()
-                metrics[model]['tn'] += tn
-                metrics[model]['fp'] += fp
-                metrics[model]['fn'] += fn
-                metrics[model]['tp'] += tp
-                
-            safe_div = lambda x, y: x/y if y != 0 else np.nan
-            metrics[model]['sensitivity'] = safe_div(metrics[model]['tp'], metrics[model]['tp'] + metrics[model]['fn'])
-            metrics[model]['specitivity'] = safe_div(metrics[model]['tn'], metrics[model]['tn'] + metrics[model]['fp'])
+                session_metrics[(patient_id, session_id)] = {
+                    'tn': tn,
+                    'fp': fp,
+                    'fn': fn,
+                    'tp': tp,
+                }
+            global_metrics.setdefault(model, defaultdict(int))
+            for metric, val in session_metrics[(patient_id, session_id)].items():
+                global_metrics[model][metric] += val
+
+            update_with_derived_metrics(session_metrics[(patient_id, session_id)])
 
             # Initilize real_ranges only for the first model
             # Other models should use the same data, so we can just reuse the same real_ranges
@@ -115,19 +125,19 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
                 real_ranges = list(get_ranges(df_model['label'], target_val=1))
             real_it = Peekable(iter(real_ranges))
             pred_it = Peekable(iter(get_ranges(df_model['predicted_label'], target_val=1)))
-            real_start = real_end = pred_start = pred_end = -1
-            for interval, is_real in split_and_sort_crises(real_it, pred_it):
-                # add to lists
-                if is_real:
-                    real_start, real_end = interval
-                    real_crises.append(get_crisis(real_start, real_end))
-                else:
-                    pred_start, pred_end = interval
-                    pred_crises.append(get_crisis(pred_start, pred_end, model=model))
+            for real_interval, pred_interval in split_and_zip_crises(real_it, pred_it):
+                if real_interval is not None and not is_last_crisis(real_interval, real_crises):
+                    # if the real crisis is not already in the list, append it
+                    real_crises.append(get_crisis(*real_interval))
+                if pred_interval is not None and not is_last_crisis(pred_interval, pred_crises):
+                    # if the predicted crisis is not already in the list, append it
+                    pred_crises.append(get_crisis(*pred_interval, model=model))
 
                 # detect intersections
-                if real_start == -1 or pred_start == -1:
+                if real_interval is None or pred_interval is None:
                     continue
+                real_start, real_end = real_interval
+                pred_start, pred_end = pred_interval
                 intersection_start = max(real_start, pred_start)
                 intersection_end = min(real_end, pred_end)
                 intersection_duration = intersection_end - intersection_start
@@ -142,54 +152,137 @@ def identify_crises(cons_folder: str = 'output/preds-v0_6',
 
     tagged_crises = []
     for model in models:
+        update_with_derived_metrics(global_metrics[model])
         tagged_crises_for_model, crises_metrics_for_model = \
             compute_metrics(real_crises, pred_crises, crises_intersections, model=model)
-        metrics[model].update(crises_metrics_for_model)
+        global_metrics[model].update(crises_metrics_for_model)
         tagged_crises += tagged_crises_for_model
+
+        if loaded_models is not None and model in loaded_models:
+            explainer = shap.TreeExplainer(loaded_models[model])
+            global_metrics[model]['shap_expected_value'] = explainer.expected_value[1]
 
     dicts_to_csv(real_crises+pred_crises, os.path.join(output_folder, 'crises.csv'), drop=['start', 'end'])
     dicts_to_csv(crises_intersections, os.path.join(output_folder, 'intersections.csv'))
     dicts_to_csv(sessions, os.path.join(output_folder, 'sessions.csv'))
     dicts_to_csv(tagged_crises, os.path.join(output_folder, 'tagged_crises.csv'))
 
-    metrics_df = pd.DataFrame([{'model': model, 'metric': metric, 'value': value}
-                               for model, model_metrics in metrics.items()
-                               for metric, value in model_metrics.items()])
-    metrics_df.to_csv(os.path.join(output_folder, 'metrics.csv'), index=False)
+    global_metrics_df = pd.DataFrame([{'model': model, 'metric': metric, 'value': value}
+                                      for model, model_metrics in global_metrics.items()
+                                      for metric, value in model_metrics.items()])
+    global_metrics_df.to_csv(os.path.join(output_folder, 'metrics.csv'), index=False)
+
+    session_metrics_df = pd.DataFrame([{'patient_id': patient_id,
+                                        'session_id': session_id,
+                                        'metric': metric,
+                                        'value': value}
+                                      for (patient_id, session_id), metrics in session_metrics.items()
+                                      for metric, value in metrics.items()])
+    session_metrics_df.to_csv(os.path.join(output_folder, 'session_metrics.csv'), index=False)
 
 
-def split_and_sort_crises(real_it: Peekable[Interval], pred_it: Peekable[Interval]) \
-        -> Iterable[Tuple[Interval, bool]]:
+
+def update_with_derived_metrics(metrics: dict) -> None:
+    safe_div = lambda x, y: x/y if y != 0 else np.nan
+    tp = metrics['tp']
+    tn = metrics['tn']
+    fn = metrics['fn']
+    fp = metrics['fp']
+    metrics['specitivity'] = safe_div(tn, tn + fp)
+    metrics['precision'] = safe_div(tp, tp + fp)
+    metrics['recall'] = safe_div(tp, tp + fn) # i.e. sensitivity
+    metrics['f1'] = 2 * safe_div(metrics['precision'] * metrics['recall'],
+                                 metrics['precision'] + metrics['recall'])
+
+
+def is_last_crisis(crisis: Interval, crises_list: List[dict]) -> bool:
+    if not crises_list:
+        return False
+    last = crises_list[-1]
+    start, end = crisis
+    return last['start'] == start and last['end'] == end
+
+
+def split_and_zip_crises(real_it: Peekable[Interval], pred_it: Peekable[Interval]) \
+        -> Iterable[Tuple[Optional[Interval], Optional[Interval]]]:
+    if not real_it.has_next():
+        
+        return
+    elif not pred_it.has_next():
+        # If there are no predicted crisis, just yield the real ones
+        while real_it.has_next():
+            yield real_it.next(), None
+        return
+
+    # These variables will be properly initialized in the first iteration
+    # of the while loop. We initialize them now to indicate to linters
+    # that these variables are not unbound.
     real_start = real_end = pred_start = pred_end = -1
-    while real_it.has_next() or pred_it.has_next():
-        if real_it.has_next() and real_end < pred_end:
-            is_real = True
-        elif pred_it.has_next() and pred_end < real_end:
-            is_real = False
-        elif real_it.has_next():
-            is_real = True
+
+    # indicates whether we need to fetch a new real/predicted crisis
+    update_real = update_pred = True
+    while True:
+        if update_real:
+            if real_it.has_next():
+                # If there is another real crisis, get it
+                real_start, real_end = real_it.next()
+            else:
+                # Otherwise, yield the predicted ones and return
+                if not update_pred:
+                    yield None, (pred_start, pred_end)
+                while pred_it.has_next():
+                    yield None, pred_it.next()
+                return
+    
+        if update_pred:
+            if pred_it.has_next():
+                # If there is another predicted crisis, get it
+                pred_start, pred_end = pred_it.next()
+            else:
+                # Otherwise, yield the real ones and return
+                yield (real_start, real_end), None
+                while real_it.has_next():
+                    yield real_it.next(), None
+                return
+
+        # If we're here, then there are both real and predicted crises
+        update_real = update_pred = False
+        if real_end <= pred_start:
+            # the real crisis happens before the predicted one (no overlap)
+            yield (real_start, real_end), None
+            update_real = True
+        elif pred_end <= real_start:
+            # the predicted crisis happens before the real one (no overlap)
+            yield None, (pred_start, pred_end)
+            update_pred = True
+        elif real_start - pred_start > MAX_OVERPREDICTION:
+            # otherwise, there is overlap
+
+            # the prediction starts too early, so we split it into two parts:
+            # - the part of the prediction that's too early (yielded now)
+            # - the part that's ok (left for the next iteration)
+            yield None, (pred_start, real_start - MAX_OVERPREDICTION - 1)
+            pred_start = real_start - MAX_OVERPREDICTION
+        elif pred_end - real_end > MAX_OVERPREDICTION:
+            # the prediction ends too late, so we split it into two parts:
+            # - the part that's ok (yielded now)
+            # - the part of the prediction that's too late (left for the next iteration)
+            yield (real_start, real_end), (pred_start, real_end+MAX_OVERPREDICTION)
+            pred_start = real_end + MAX_OVERPREDICTION + 1
+            update_real = True
         else:
-            is_real = False
-
-        if is_real:
-            real_start, real_end = real_it.next()
-            yield (real_start, real_end), True
-        else:
-            pred_start, pred_end = pred_it.next()
-            for pred_start, pred_end in split_interval(pred_start, pred_end, real_start, real_end):
-                yield (pred_start, pred_end), False
-
-
-def split_interval(start, end, split_start, split_end) -> Iterable[Tuple[int, int]]:
-    if split_start - start > MAX_OVERPREDICTION and end >= split_start:
-        yield (start, split_start-1)
-        start = split_start
-    if end - split_end > MAX_OVERPREDICTION and start <= split_end:
-        yield (start, split_end)
-        yield (split_end+1, end)
-    else:
-        yield (start, end)
-
+            # otherwise, the prediction ends within the maximum allowed time
+            yield (real_start, real_end), (pred_start, pred_end)
+            # we advance only the crisis (real or predicted) which ends earlier,
+            # because the later crisis might still have other intersections
+            if pred_end < real_end and pred_it.has_next() and pred_it.peek()[0] < real_end:
+                # in this case, the next predicted crisis will intersect with the current real crisis,
+                # so we don't update the real crisis
+                update_pred = True
+            else:
+                # otherwise, we update both
+                # note that a predicted crisis can only intersect a single real crisis
+                update_real = update_pred = True
 
 def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_intersections: List[dict], model: str):
     tagged_crises = []
@@ -278,7 +371,7 @@ def dicts_to_csv(dicts: List[dict], path: str, drop: List[Hashable] = []):
     df.to_csv(path, index=False)
 
 
-def parse_identify_crises_args(
+def parse_compute_metrics_and_crises_args(
         args_to_parse: List[str]) -> argparse.Namespace:
     """
     Parse arguments for adaptable input.
@@ -305,6 +398,6 @@ def parse_identify_crises_args(
 
 
 if __name__ == '__main__':
-    args = parse_identify_crises_args(sys.argv[1:])
+    args = parse_compute_metrics_and_crises_args(sys.argv[1:])
     args_dict = convert_args_to_dict(args)
-    identify_crises(**args_dict)
+    compute_metrics_and_crises(**args_dict)

@@ -304,6 +304,24 @@ def dag_model_pipeline():
                     f"Cannot generate predictions for model {model_name} at {model_path}"
                 ) from err
         return models
+    
+    def flatten(nested_list: List[list]) -> list:
+        return [x
+                for lst in nested_list
+                for x in lst]
+
+    @task()
+    def t_consolidate_parameters(
+        param_dict_1_list: List[dict], param_dict_2_list: List[dict]
+    ) -> List[dict]:
+        consolidated_parameters_list = []
+        for param_dict_1, param_dict_2 in zip(param_dict_1_list, param_dict_2_list):
+            if param_dict_1 is None or param_dict_2 is None:
+                consolidated_parameters_list.append(None)
+            else:
+                consolidated_parameters_list.append({**param_dict_1, **param_dict_2})
+
+        return consolidated_parameters_list
 
     @task()
     def t_get_initial_parameters(partition_index: int) -> List[dict]:
@@ -391,18 +409,20 @@ def dag_model_pipeline():
         return map_parameters(inner, parameters_list)
 
     @task()
-    def t_identify_crises(parameters_list: List[List[dict]]) -> None:
-        from src.usecase.identify_crises import identify_crises
-
-        identify_crises(PREDICTIONS_FOLDER, CRISES_FOLDER)
+    def t_compute_metrics_and_crises(parameters_list: List[List[dict]]) -> None:
+        from src.usecase.compute_metrics_and_crises import compute_metrics_and_crises
+        parameters_list = flatten(parameters_list)
+        models = load_models(parameters_list[0]["model_paths"])
+        compute_metrics_and_crises(PREDICTIONS_FOLDER, CRISES_FOLDER, models)
 
     output_parameters = []
     for partition_index in range(NUM_PARTITIONS):
         parameters_list = t_get_initial_parameters(partition_index)
-        parameters_list = t_generate_predictions_and_shap(parameters_list)
+        predictions_and_shap_output = t_generate_predictions_and_shap(parameters_list)
+        parameters_list = t_consolidate_parameters(parameters_list, predictions_and_shap_output)
         output_parameters.append(parameters_list)
 
-    t_identify_crises(output_parameters)
+    t_compute_metrics_and_crises(output_parameters)
 
 
 @dag(

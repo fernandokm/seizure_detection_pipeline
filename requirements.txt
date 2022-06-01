@@ -23,7 +23,8 @@ Pillow==8.4.0
 psycopg2-binary==2.8.6
 py-ecg-detectors==1.0.2
 pyEDFlib==0.1.22
-pyerfa==2.0.0.1
+pyerfa==1.7.3
+pyparsing==2.4.7
 python-dateutil==2.8.2
 pytz==2022.1
 PyYAML==6.0
