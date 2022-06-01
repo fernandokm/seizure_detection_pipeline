@@ -16,7 +16,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1654094921491,
+  "iteration": 1654096634860,
   "links": [
     {
       "icon": "dashboard",
@@ -76,7 +76,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "Max heart rate ($tag_patient)",
+          "alias": "$feature_1",
           "groupBy": [
             {
               "params": [
@@ -132,7 +132,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Heart rate",
+      "title": "$feature_1",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -345,7 +345,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Correlation between main and secondary features",
+      "title": "Correlation between $feature_1 and $feature_2",
       "type": "ae3e-plotly-panel"
     },
     {
@@ -434,7 +434,7 @@
       {
         "allValue": null,
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "00004671_s007_t000",
           "value": "00004671_s007_t000"
         },
@@ -461,12 +461,11 @@
       {
         "allValue": null,
         "current": {
-          "selected": true,
-          "text": "median_nni",
-          "value": "median_nni"
+          "selected": false,
+          "text": "Modified_csi",
+          "value": "Modified_csi"
         },
-        "datasource": "Postgres",
-        "definition": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data' AND column_name NOT  LIKE 'shap_values_%'",
+        "datasource": "aura-influxDB",
         "error": null,
         "hide": 0,
         "includeAll": false,
@@ -474,6 +473,41 @@
         "multi": false,
         "name": "feature_1",
         "options": [
+          {
+            "selected": true,
+            "text": "Modified_csi",
+            "value": "Modified_csi"
+          },
+          {
+            "selected": false,
+            "text": "csi",
+            "value": "csi"
+          },
+          {
+            "selected": false,
+            "text": "cvi",
+            "value": "cvi"
+          },
+          {
+            "selected": false,
+            "text": "cvnni",
+            "value": "cvnni"
+          },
+          {
+            "selected": false,
+            "text": "cvsd",
+            "value": "cvsd"
+          },
+          {
+            "selected": false,
+            "text": "filename",
+            "value": "filename"
+          },
+          {
+            "selected": false,
+            "text": "hf",
+            "value": "hf"
+          },
           {
             "selected": false,
             "text": "index",
@@ -491,83 +525,8 @@
           },
           {
             "selected": false,
-            "text": "mean_nni",
-            "value": "mean_nni"
-          },
-          {
-            "selected": false,
-            "text": "sdnn",
-            "value": "sdnn"
-          },
-          {
-            "selected": false,
-            "text": "sdsd",
-            "value": "sdsd"
-          },
-          {
-            "selected": false,
-            "text": "nni_50",
-            "value": "nni_50"
-          },
-          {
-            "selected": false,
-            "text": "pnni_50",
-            "value": "pnni_50"
-          },
-          {
-            "selected": false,
-            "text": "nni_20",
-            "value": "nni_20"
-          },
-          {
-            "selected": false,
-            "text": "pnni_20",
-            "value": "pnni_20"
-          },
-          {
-            "selected": false,
-            "text": "rmssd",
-            "value": "rmssd"
-          },
-          {
-            "selected": true,
-            "text": "median_nni",
-            "value": "median_nni"
-          },
-          {
-            "selected": false,
-            "text": "range_nni",
-            "value": "range_nni"
-          },
-          {
-            "selected": false,
-            "text": "cvsd",
-            "value": "cvsd"
-          },
-          {
-            "selected": false,
-            "text": "cvnni",
-            "value": "cvnni"
-          },
-          {
-            "selected": false,
-            "text": "mean_hr",
-            "value": "mean_hr"
-          },
-          {
-            "selected": false,
-            "text": "max_hr",
-            "value": "max_hr"
-          },
-          {
-            "selected": false,
-            "text": "min_hr",
-            "value": "min_hr"
-          },
-          {
-            "selected": false,
-            "text": "std_hr",
-            "value": "std_hr"
+            "text": "label",
+            "value": "label"
           },
           {
             "selected": false,
@@ -576,33 +535,78 @@
           },
           {
             "selected": false,
-            "text": "hf",
-            "value": "hf"
-          },
-          {
-            "selected": false,
-            "text": "vlf",
-            "value": "vlf"
-          },
-          {
-            "selected": false,
             "text": "lf_hf_ratio",
             "value": "lf_hf_ratio"
           },
           {
             "selected": false,
-            "text": "csi",
-            "value": "csi"
+            "text": "max_hr",
+            "value": "max_hr"
           },
           {
             "selected": false,
-            "text": "cvi",
-            "value": "cvi"
+            "text": "mean_hr",
+            "value": "mean_hr"
           },
           {
             "selected": false,
-            "text": "modified_csi",
-            "value": "modified_csi"
+            "text": "mean_nni",
+            "value": "mean_nni"
+          },
+          {
+            "selected": false,
+            "text": "median_nni",
+            "value": "median_nni"
+          },
+          {
+            "selected": false,
+            "text": "min_hr",
+            "value": "min_hr"
+          },
+          {
+            "selected": false,
+            "text": "model",
+            "value": "model"
+          },
+          {
+            "selected": false,
+            "text": "nni_20",
+            "value": "nni_20"
+          },
+          {
+            "selected": false,
+            "text": "nni_50",
+            "value": "nni_50"
+          },
+          {
+            "selected": false,
+            "text": "pnni_20",
+            "value": "pnni_20"
+          },
+          {
+            "selected": false,
+            "text": "pnni_50",
+            "value": "pnni_50"
+          },
+          {
+            "selected": false,
+            "text": "predicted_label",
+            "value": "predicted_label"
+          },
+          {
+            "selected": false,
+            "text": "range_nni",
+            "value": "range_nni"
+          },
+          {
+            "selected": false,
+            "text": "ratio_sd2_sd1",
+            "value": "ratio_sd2_sd1"
+          },
+          {
+            "selected": false,
+            "text": "rmssd",
+            "value": "rmssd"
           },
           {
             "selected": false,
@@ -621,18 +625,28 @@
           },
           {
             "selected": false,
-            "text": "ratio_sd2_sd1",
-            "value": "ratio_sd2_sd1"
+            "text": "sdnn",
+            "value": "sdnn"
           },
           {
             "selected": false,
-            "text": "timestamp",
-            "value": "timestamp"
+            "text": "sdsd",
+            "value": "sdsd"
+          },
+          {
+            "selected": false,
+            "text": "std_hr",
+            "value": "std_hr"
+          },
+          {
+            "selected": false,
+            "text": "vlf",
+            "value": "vlf"
           }
         ],
-        "query": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data' AND column_name NOT  LIKE 'shap_values_%'",
+        "query": "SHOW FIELD KEYS FROM features",
         "refresh": 0,
-        "regex": "",
+        "regex": "^((?!(shap_values|lime_values)).*)",
         "skipUrlSync": false,
         "sort": 0,
         "tagValuesQuery": "",
@@ -644,12 +658,12 @@
       {
         "allValue": null,
         "current": {
-          "selected": true,
-          "text": "nni_50",
-          "value": "nni_50"
+          "selected": false,
+          "text": "cvsd",
+          "value": "cvsd"
         },
-        "datasource": "Postgres",
-        "definition": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data' AND column_name NOT  LIKE 'shap_values_%'",
+        "datasource": "aura-influxDB",
+        "definition": "",
         "error": null,
         "hide": 0,
         "includeAll": false,
@@ -657,6 +671,41 @@
         "multi": false,
         "name": "feature_2",
         "options": [
+          {
+            "selected": false,
+            "text": "Modified_csi",
+            "value": "Modified_csi"
+          },
+          {
+            "selected": false,
+            "text": "csi",
+            "value": "csi"
+          },
+          {
+            "selected": false,
+            "text": "cvi",
+            "value": "cvi"
+          },
+          {
+            "selected": false,
+            "text": "cvnni",
+            "value": "cvnni"
+          },
+          {
+            "selected": true,
+            "text": "cvsd",
+            "value": "cvsd"
+          },
+          {
+            "selected": false,
+            "text": "filename",
+            "value": "filename"
+          },
+          {
+            "selected": false,
+            "text": "hf",
+            "value": "hf"
+          },
           {
             "selected": false,
             "text": "index",
@@ -674,83 +723,8 @@
           },
           {
             "selected": false,
-            "text": "mean_nni",
-            "value": "mean_nni"
-          },
-          {
-            "selected": false,
-            "text": "sdnn",
-            "value": "sdnn"
-          },
-          {
-            "selected": false,
-            "text": "sdsd",
-            "value": "sdsd"
-          },
-          {
-            "selected": true,
-            "text": "nni_50",
-            "value": "nni_50"
-          },
-          {
-            "selected": false,
-            "text": "pnni_50",
-            "value": "pnni_50"
-          },
-          {
-            "selected": false,
-            "text": "nni_20",
-            "value": "nni_20"
-          },
-          {
-            "selected": false,
-            "text": "pnni_20",
-            "value": "pnni_20"
-          },
-          {
-            "selected": false,
-            "text": "rmssd",
-            "value": "rmssd"
-          },
-          {
-            "selected": false,
-            "text": "median_nni",
-            "value": "median_nni"
-          },
-          {
-            "selected": false,
-            "text": "range_nni",
-            "value": "range_nni"
-          },
-          {
-            "selected": false,
-            "text": "cvsd",
-            "value": "cvsd"
-          },
-          {
-            "selected": false,
-            "text": "cvnni",
-            "value": "cvnni"
-          },
-          {
-            "selected": false,
-            "text": "mean_hr",
-            "value": "mean_hr"
-          },
-          {
-            "selected": false,
-            "text": "max_hr",
-            "value": "max_hr"
-          },
-          {
-            "selected": false,
-            "text": "min_hr",
-            "value": "min_hr"
-          },
-          {
-            "selected": false,
-            "text": "std_hr",
-            "value": "std_hr"
+            "text": "label",
+            "value": "label"
           },
           {
             "selected": false,
@@ -759,33 +733,78 @@
           },
           {
             "selected": false,
-            "text": "hf",
-            "value": "hf"
-          },
-          {
-            "selected": false,
-            "text": "vlf",
-            "value": "vlf"
-          },
-          {
-            "selected": false,
             "text": "lf_hf_ratio",
             "value": "lf_hf_ratio"
           },
           {
             "selected": false,
-            "text": "csi",
-            "value": "csi"
+            "text": "max_hr",
+            "value": "max_hr"
           },
           {
             "selected": false,
-            "text": "cvi",
-            "value": "cvi"
+            "text": "mean_hr",
+            "value": "mean_hr"
           },
           {
             "selected": false,
-            "text": "modified_csi",
-            "value": "modified_csi"
+            "text": "mean_nni",
+            "value": "mean_nni"
+          },
+          {
+            "selected": false,
+            "text": "median_nni",
+            "value": "median_nni"
+          },
+          {
+            "selected": false,
+            "text": "min_hr",
+            "value": "min_hr"
+          },
+          {
+            "selected": false,
+            "text": "model",
+            "value": "model"
+          },
+          {
+            "selected": false,
+            "text": "nni_20",
+            "value": "nni_20"
+          },
+          {
+            "selected": false,
+            "text": "nni_50",
+            "value": "nni_50"
+          },
+          {
+            "selected": false,
+            "text": "pnni_20",
+            "value": "pnni_20"
+          },
+          {
+            "selected": false,
+            "text": "pnni_50",
+            "value": "pnni_50"
+          },
+          {
+            "selected": false,
+            "text": "predicted_label",
+            "value": "predicted_label"
+          },
+          {
+            "selected": false,
+            "text": "range_nni",
+            "value": "range_nni"
+          },
+          {
+            "selected": false,
+            "text": "ratio_sd2_sd1",
+            "value": "ratio_sd2_sd1"
+          },
+          {
+            "selected": false,
+            "text": "rmssd",
+            "value": "rmssd"
           },
           {
             "selected": false,
@@ -804,18 +823,28 @@
           },
           {
             "selected": false,
-            "text": "ratio_sd2_sd1",
-            "value": "ratio_sd2_sd1"
+            "text": "sdnn",
+            "value": "sdnn"
           },
           {
             "selected": false,
-            "text": "timestamp",
-            "value": "timestamp"
+            "text": "sdsd",
+            "value": "sdsd"
+          },
+          {
+            "selected": false,
+            "text": "std_hr",
+            "value": "std_hr"
+          },
+          {
+            "selected": false,
+            "text": "vlf",
+            "value": "vlf"
           }
         ],
-        "query": "SELECT column_name FROM INFORMATION_SCHEMA. COLUMNS WHERE TABLE_NAME = 'shap_data' AND column_name NOT  LIKE 'shap_values_%'",
+        "query": "SHOW FIELD KEYS FROM features",
         "refresh": 0,
-        "regex": "",
+        "regex": "^((?!(shap_values|lime_values)).*)",
         "skipUrlSync": false,
         "sort": 0,
         "tagValuesQuery": "",
@@ -827,12 +856,12 @@
     ]
   },
   "time": {
-    "from": "2012-08-04T15:51:18.018Z",
-    "to": "2012-08-04T16:22:37.804Z"
+    "from": "2012-08-04T16:01:05.031Z",
+    "to": "2012-08-04T16:13:40.082Z"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Patient | Data scientist layout",
   "uid": "dstLyt",
-  "version": 11
+  "version": 13
 }

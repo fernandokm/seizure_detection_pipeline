@@ -155,7 +155,6 @@ for (let i = 0; i < timestamp.length; i++) {
 
 let [begin_of_real_crisis, end_of_real_crisis] = find_timestamps_of_crisis(timestamp, labels);
 let [begin_of_predicted_crisis, end_of_predicted_crisis] = find_timestamps_of_crisis(timestamp, predicted_labels);
-console.log(begin_of_real_crisis, end_of_real_crisis)
 
 let real_crisis_buttons_beginning = [];
 let predicted_crisis_buttons_beginning = [];
