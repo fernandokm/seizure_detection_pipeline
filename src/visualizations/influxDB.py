@@ -3,7 +3,7 @@ from src.visualizations.log import log
 from typing import Iterator, Any, Union
 
 import csv
-from influxdb_client import InfluxDBClient, WriteOptions
+from influxdb_client import InfluxDBClient, WriteOptions, WritePrecision
 from pyedflib import EdfReader
 import rx
 import datetime
@@ -32,7 +32,7 @@ def push_influxdb_data(
         with client.write_api(
             write_options=WriteOptions(batch_size=50000, flush_interval=10000)
         ) as write_api:
-            write_api.write(bucket, record=data)
+            write_api.write(bucket, record=data, write_precision=WritePrecision.US)
 
 
 def from_edf(
@@ -56,8 +56,9 @@ def from_edf(
             + [f"channel={escape(r.getSignalLabels()[channel])}"]
         )
         tagslist = f",{tagslist}" if tagslist else ""
-        for val in r.readSignal(channel):
-            yield f"{mesurement}{tagslist} {escape(field)}={escapevalue(val)} {to_nanoseconds(time)}"
+        for i, val in enumerate(r.readSignal(channel)):
+            if i % 10 == 0:
+                yield f"{mesurement}{tagslist} {escape(field)}={escapevalue(val)} {to_microseconds(time)}"
             # yield Point(f"{mesurement}").tag("channel",f"{channel}").field(f"Tension (uV)", val).time(time)
             time += datetime.timedelta(seconds=T_sample_real)
 
@@ -142,10 +143,10 @@ def from_csv(
                 value = escapevalue(v)
                 if k == time_column or value == "":
                     continue
-                yield f"{measurement}{tagslist} {escape(k)}={value} {to_nanoseconds(time)}"
+                yield f"{measurement}{tagslist} {escape(k)}={value} {to_microseconds(time)}"
 
 
-def to_nanoseconds(date_time: Any, mult_to_seconds=1):
+def to_microseconds(date_time: Any, mult_to_seconds=1):
     """
     TODO: comment better
     Convert date_time to nanoseconds
@@ -154,13 +155,13 @@ def to_nanoseconds(date_time: Any, mult_to_seconds=1):
     mult = 1e9 * mult_to_seconds
     if type(date_time) == str:
         try:
-            return int(float(date_time) * mult)
+            return int(float(date_time) * mult / 1e3)
         except:
-            return int(dateutil.parser.parse(date_time).timestamp() * mult)
+            return int(dateutil.parser.parse(date_time).timestamp() * mult / 1e3)
     elif type(date_time) in [int, float, float64]:
-        return int(date_time * mult)
+        return int(date_time * mult / 1e3)
     elif type(date_time) == datetime.datetime:
-        return int(date_time.timestamp() * 1e9)
+        return int(date_time.timestamp() * 1e6)
     raise TypeError("Invalid date_time type: {}".format(type(date_time)))
 
 
