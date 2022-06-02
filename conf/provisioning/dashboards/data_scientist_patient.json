@@ -26,7 +26,7 @@
         "datasource": "Postgres",
         "enable": true,
         "hide": false,
-        "iconColor": "#B877D9",
+        "iconColor": "#5794F2",
         "limit": 100,
         "name": "Crises prédites",
         "rawQuery": "SELECT \ntime_start as time,\ntime_end as timeend,\n'Crise prédite (Durée : ' || (time_end-time_start)  || 's)' AS text,patient_id,session_id\nFROM crises\nWHERE \ntype ='predicted' \nAND patient_id = split_part('$patient', '_', 1)::INTEGER\nAND session_id = split_part('$patient', '_', 2) || '_' || split_part('$patient', '_', 3);\n",
@@ -40,7 +40,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1654154873393,
+  "iteration": 1654155051770,
   "links": [
     {
       "icon": "dashboard",
@@ -966,5 +966,5 @@
   "timezone": "",
   "title": "Patient | Data scientist layout",
   "uid": "dstLyt",
-  "version": 21
+  "version": 22
 }

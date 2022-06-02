@@ -26,7 +26,7 @@
         "datasource": "Postgres",
         "enable": true,
         "hide": false,
-        "iconColor": "#B877D9",
+        "iconColor": "#5794F2",
         "limit": 100,
         "name": "Crises prédites",
         "rawQuery": "SELECT \ntime_start as time,\ntime_end as timeend,\n'Crise prédite (Durée : ' || (time_end-time_start)  || 's)' AS text,patient_id,session_id\nFROM crises\nWHERE \ntype ='predicted' \nAND patient_id = split_part('$patient', '_', 1)::INTEGER\nAND session_id = split_part('$patient', '_', 2) || '_' || split_part('$patient', '_', 3);\n",
@@ -40,7 +40,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1654154789737,
+  "iteration": 1654155855467,
   "links": [
     {
       "icon": "dashboard",
@@ -711,12 +711,12 @@
     ]
   },
   "time": {
-    "from": "2012-08-04T16:10:10.625Z",
-    "to": "2012-08-04T16:21:19.775Z"
+    "from": "2012-08-04T15:53:26.900Z",
+    "to": "2012-08-04T15:55:01.100Z"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Patient | Doctor layout",
   "uid": "dctLyt",
-  "version": 4
+  "version": 6
 }
