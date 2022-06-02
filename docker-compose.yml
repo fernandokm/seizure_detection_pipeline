@@ -23,9 +23,10 @@ x-airflow-common:
     - ./scripts:/opt/airflow/scripts
     - ${DATA_PATH}/${SYMLINK_FOLDER}:/opt/airflow/data/${SYMLINK_FOLDER}
     - ./output:/opt/airflow/output
-    - ./models:/opt/airflow/models
+    - ./pipeline_models:/opt/airflow/pipeline_models
     - ./src:/opt/airflow/src
     - ./great_expectations:/opt/airflow/great_expectations
+    - ./conf:/opt/airflow/conf
   user: "${AIRFLOW_UID}:0"
   depends_on:
     redis:
@@ -43,6 +44,7 @@ services:
       - '${INFLUXDB_PORT}:8086'
     volumes:
       - influxdb-storage:/var/lib/influxdb
+      - ./influxdb/:/etc/influxdb/
     environment:
       - INFLUXDB_DB=${INFLUXDB_DATABASE}
       - INFLUXDB_ADMIN_USER=${INFLUXDB_USERNAME}
@@ -85,9 +87,13 @@ services:
       - GF_DATABASE_TYPE=postgres
       - GF_DATABASE_HOST=postgres:5432
       - GF_DATABASE_NAME=${POSTGRES_DATABASE_GRAFANA}
+      - POSTGRESQL_DB=${POSTGRES_DATABASE}
       - GF_DATABASE_USER=${POSTGRES_USER}
       - GF_DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - GF_INSTALL_PLUGINS=ae3e-plotly-panel # v0.4.0
+      - GF_INSTALL_PLUGINS=ae3e-plotly-panel,aidanmountford-html-panel # v0.4.0
+      - INFLUXDB_DATABASE=${INFLUXDB_DATABASE}
+      - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
+      - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
   
   redis:
     image: redis:6.2.5
@@ -129,6 +135,17 @@ services:
     <<: *airflow-common
     container_name: aura-airflow-worker
     command: celery worker
+    environment:
+      <<: *airflow-common-env
+      POSTGRES_HOST_URL: $POSTGRES_HOST_URL
+      POSTGRES_DATABASE: $POSTGRES_DATABASE
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      INFLUXDB_HOST_URL: $INFLUXDB_HOST_URL
+      INFLUXDB_PORT: $INFLUXDB_PORT
+      INFLUXDB_USERNAME: $INFLUXDB_USERNAME
+      INFLUXDB_PASSWORD: $INFLUXDB_PASSWORD
+      INFLUXDB_DATABASE: $INFLUXDB_DATABASE
     healthcheck:
       test:
         - "CMD-SHELL"
