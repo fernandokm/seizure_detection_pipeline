@@ -15,7 +15,7 @@ IDB_PASSWORD = os.environ.get("INFLUXDB_PASSWORD")
 IDB_DATABASE = os.environ.get("INFLUXDB_DATABASE")
 
 PATIENT_DASHBOARD = os.path.join(
-    os.path.dirname(__file__), "../../conf/provisioning/dashboards/patient.json"
+    os.path.dirname(__file__), "../../conf/provisioning/dashboards/data_scientist_patient.json"
 )
 HOME_DASHBOARD = os.path.join(
     os.path.dirname(__file__), "../../conf/provisioning/dashboards/main.json"
@@ -84,7 +84,7 @@ def generate_patient_links(
     for start_time, end_time, patient_id in zip(start_times, end_times, patient_ids):
         patient_label = generate_patient_label(patient_id)
         links.append(
-            f"<a href='/d/{patient_dashboard_uid}/patient?orgId=1&var-patient={patient_id}&from={start_time}&to={end_time}'>{patient_label}{generate_patient_subtitle(patient_id)}</a>"
+            f"<a href='/d/{patient_dashboard_uid}/patient-data-scientist-layout?orgId=1&var-patient={patient_id}&from={start_time}&to={end_time}'>{patient_label}{generate_patient_subtitle(patient_id)}</a>"
         )
     return links
 
