@@ -16,8 +16,8 @@
         "hide": false,
         "iconColor": "rgba(255, 96, 96, 1)",
         "limit": 100,
-        "name": "Crises réelles",
-        "rawQuery": "SELECT \ntime_start as time,\ntime_end as timeend,\n'Crise réelle (Durée : ' || (time_end-time_start)  || 's)' AS text,patient_id,session_id\nFROM crises\nWHERE \ntype = 'real'\nAND patient_id = split_part('$patient', '_', 1)::INTEGER\nAND session_id = split_part('$patient', '_', 2) || '_' || split_part('$patient', '_', 3);",
+        "name": "Real seizures",
+        "rawQuery": "SELECT \ntime_start as time,\ntime_end as timeend,\n'Real seizure (Duration : ' || (time_end-time_start)  || 's)' AS text,patient_id,session_id\nFROM crises\nWHERE \ntype = 'real'\nAND patient_id = split_part('$patient', '_', 1)::INTEGER\nAND session_id = split_part('$patient', '_', 2) || '_' || split_part('$patient', '_', 3);",
         "showIn": 0,
         "tags": [],
         "type": "tags"
@@ -28,8 +28,8 @@
         "hide": false,
         "iconColor": "#5794F2",
         "limit": 100,
-        "name": "Crises prédites",
-        "rawQuery": "SELECT \ntime_start as time,\ntime_end as timeend,\n'Crise prédite (Durée : ' || (time_end-time_start)  || 's)' AS text,patient_id,session_id\nFROM crises\nWHERE \ntype ='predicted' \nAND patient_id = split_part('$patient', '_', 1)::INTEGER\nAND session_id = split_part('$patient', '_', 2) || '_' || split_part('$patient', '_', 3);\n",
+        "name": "Predicted seizures",
+        "rawQuery": "SELECT \ntime_start as time,\ntime_end as timeend,\n'Predicted seizure (Duration : ' || (time_end-time_start)  || 's)' AS text,patient_id,session_id\nFROM crises\nWHERE \ntype ='predicted' \nAND patient_id = split_part('$patient', '_', 1)::INTEGER\nAND session_id = split_part('$patient', '_', 2) || '_' || split_part('$patient', '_', 3);\n",
         "showIn": 0,
         "tags": [],
         "type": "tags"
@@ -45,7 +45,7 @@
     {
       "icon": "dashboard",
       "tags": [],
-      "title": "Accueil",
+      "title": "Home",
       "tooltip": "",
       "type": "link",
       "url": "/"
