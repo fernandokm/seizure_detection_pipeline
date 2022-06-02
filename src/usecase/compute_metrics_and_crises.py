@@ -64,6 +64,7 @@ def compute_metrics_and_crises(cons_folder: str = 'output/preds-v0_6',
     crises_intersections = []
     global_metrics = defaultdict(lambda: {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0})
     session_metrics = defaultdict(lambda: {'tp': 0, 'fp': 0, 'tn': 0, 'fn': 0})
+    session_durations = {}
     models = set()
     for i, cons_file in enumerate(glob.iglob(os.path.join(cons_folder, "**/*.csv"), recursive=True)):
         cons_file_name = os.path.basename(cons_file)
@@ -74,6 +75,7 @@ def compute_metrics_and_crises(cons_folder: str = 'output/preds-v0_6',
         patient_id, session_id = patient_and_session_id.split('_', 1)
 
         df = pd.read_csv(cons_file, parse_dates=['timestamp'])
+        session_durations[(patient_id, session_id)] = df.shape[0]
         df['timestamp'] = df['timestamp'].values.astype(np.int64) / 10**9
         if 'predicted_label' not in df:
             df['predicted_label'] = np.nan
@@ -154,7 +156,7 @@ def compute_metrics_and_crises(cons_folder: str = 'output/preds-v0_6',
     for model in models:
         update_with_derived_metrics(global_metrics[model])
         tagged_crises_for_model, crises_metrics_for_model = \
-            compute_metrics(real_crises, pred_crises, crises_intersections, model=model)
+            compute_metrics(real_crises, pred_crises, crises_intersections, session_durations, model=model)
         global_metrics[model].update(crises_metrics_for_model)
         tagged_crises += tagged_crises_for_model
 
@@ -297,10 +299,14 @@ def split_and_zip_crises(real_it: Peekable[Interval], pred_it: Peekable[Interval
                 # note that a predicted crisis can only intersect a single real crisis
                 update_real = update_pred = True
 
-def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_intersections: List[dict], model: str):
+def compute_metrics(real_crises: List[dict],
+                    pred_crises: List[dict],
+                    crises_intersections: List[dict],
+                    session_durations: Dict[Tuple[str, str], int],
+                    model: str):
     tagged_crises = []
     processed_pred_ids = set()
-    crises_metrics = {metric: 0 for metric in ('crises_fp', 'crises_tp', 'crises_fn')}
+    crises_metrics = {metric: 0 for metric in ('crises_fp', 'crises_tp', 'crises_fn', 'crises_tn')}
 
     real_to_pred = {real_id: [] for real_id in range(len(real_crises))}
     for intersection in crises_intersections:
@@ -342,12 +348,15 @@ def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_int
             'classification': classification,
         })
 
+    crises_per_session = {}
     for pred_id in range(len(pred_crises)):
         if pred_id in processed_pred_ids or pred_crises[pred_id]['model'] != model:
             continue
         tagged_crises.append({
             'real_id': None,
             'pred_id': pred_id,
+            'start': pred_crises[pred_id]['start'],
+            'end': pred_crises[pred_id]['end'],
             'time_start': pred_crises[pred_id]['time_start'],
             'time_end': pred_crises[pred_id]['time_end'],
             'patient_id': pred_crises[pred_id]['patient_id'],
@@ -356,7 +365,20 @@ def compute_metrics(real_crises: List[dict], pred_crises: List[dict], crises_int
             'overlap': 0.0,
             'classification': 'fp'
         })
+        key = pred_crises[pred_id]['patient_id'], pred_crises[pred_id]['session_id']
+        crises_per_session.setdefault(key, []).append(tagged_crises[-1])
         crises_metrics['crises_fp'] += 1
+
+    for (patient_id, session_id), duration in session_durations.items():
+        relevant_crises = crises_per_session.get((patient_id, session_id), [])
+        relevant_crises.sort(key=lambda c: c['start'])
+        last_end = -1
+        for c in relevant_crises:
+            if last_end + 1 < c['start']:
+                crises_metrics['crises_tn'] += 1
+            last_end = c['end']
+        if last_end != duration:
+            crises_metrics['crises_tn'] += 1
 
     return tagged_crises, crises_metrics
 
