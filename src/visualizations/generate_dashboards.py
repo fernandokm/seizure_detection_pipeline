@@ -3,6 +3,7 @@ from influxdb_client import InfluxDBClient
 import os
 import json
 from .postgresql import query as postgresql_query
+from .utils import split_patient_string
 
 # from .log import log
 from itertools import islice
@@ -14,7 +15,7 @@ IDB_PASSWORD = os.environ.get("INFLUXDB_PASSWORD")
 IDB_DATABASE = os.environ.get("INFLUXDB_DATABASE")
 
 PATIENT_DASHBOARD = os.path.join(
-    os.path.dirname(__file__), "../../conf/provisioning/dashboards/patient.json"
+    os.path.dirname(__file__), "../../conf/provisioning/dashboards/data_scientist_patient.json"
 )
 HOME_DASHBOARD = os.path.join(
     os.path.dirname(__file__), "../../conf/provisioning/dashboards/main.json"
@@ -83,28 +84,28 @@ def generate_patient_links(
     for start_time, end_time, patient_id in zip(start_times, end_times, patient_ids):
         patient_label = generate_patient_label(patient_id)
         links.append(
-            f"<a href='/d/{patient_dashboard_uid}/patient?orgId=1&var-patient={patient_id}&from={start_time}&to={end_time}'>{patient_label}{generate_patient_subtitle(patient_id)}</a>"
+            f"<a href='/d/{patient_dashboard_uid}/patient-data-scientist-layout?orgId=1&var-patient={patient_id}&from={start_time}&to={end_time}'>{patient_label}{generate_patient_subtitle(patient_id)}</a>"
         )
     return links
 
 
 def generate_patient_subtitle(patient_id) -> list:
+    p_id, session = split_patient_string(patient_id)
     real_crises = postgresql_query(
         host=os.environ.get("POSTGRES_HOST_URL"),
         database=os.environ.get("POSTGRES_DATABASE"),
         username=os.environ.get("POSTGRES_USER"),
         password=os.environ.get("POSTGRES_PASSWORD"),
-        query=f"SELECT * FROM crises WHERE patient_id = {patient_id} AND type == 'real'",
+        query=f"SELECT * FROM crises WHERE patient_id = {int(p_id)} AND type = 'real' AND session_id = '{session}'",
     )
     predicted_crises = postgresql_query(
         host=os.environ.get("POSTGRES_HOST_URL"),
         database=os.environ.get("POSTGRES_DATABASE"),
         username=os.environ.get("POSTGRES_USER"),
         password=os.environ.get("POSTGRES_PASSWORD"),
-        query=f"SELECT * FROM crises WHERE patient_id = {patient_id} AND type == 'predicted'",
+        query=f"SELECT * FROM crises WHERE patient_id = '{int(p_id)}' AND type = 'predicted' AND session_id = '{session}'",
     )
-
-    return f"<div class='session-subtitle'> {len(real_crises)} vraies Crises, {len(predicted_crises)}</div>"
+    return f"<div class='session-subtitle'> {len(real_crises)} vraies crises, {len(predicted_crises)} crises prédites</div>"
 
 
 def generate_patient_label(patient_id: int) -> str:

@@ -7,6 +7,19 @@
 
 console.log(data)
 
+// in case there is no data
+if (data.series.length == 0 ) {
+    return {layout: {xaxis: {
+        type : "linear"
+    }}}
+}
+// if one feature has no data points
+if (data.series[0].fields.length < 3) {
+    return {layout: {xaxis: {
+        type : "linear"
+    }}}
+}
+
 let trace = {
     x: data.series[0].fields[1].values.buffer,
     y: data.series[0].fields[2].values.buffer,
