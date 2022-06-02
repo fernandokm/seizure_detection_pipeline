@@ -1,9 +1,12 @@
 import os
 from datetime import datetime
 
+from influxdb_client import InfluxDBClient
+
 from src.visualizations import influxDB
 from src.visualizations import postgresql
 from src.visualizations.log import log
+from src.visualizations.generate_dashboards import get_patients_ids
 
 POSTGRES_HOST_URL = os.environ.get("POSTGRES_HOST_URL")
 POSTGRES_DATABASE = os.environ.get("POSTGRES_DATABASE")
@@ -50,7 +53,14 @@ def generate_influxdb_data(edf_files: dict = {}, csv_files: dict = {}):
     Generate data in influxdb from edf files
     edf_files: input edf files {}
     """
+    patients = []
+    if edf_files:
+        with InfluxDBClient(f"http://{IDB_HOST}:{IDB_PORT}", f"{IDB_USERNAME}:{IDB_PASSWORD}", org="-") as client:
+            patients = get_patients_ids(client, f"{IDB_DATABASE}/autogen")
     for patient, file in edf_files.items():
+        if patient in patients:
+            print(f'Skipping ecg for {patient}')
+            continue
         influxDB.push_ecg_to_influxdb(
             file,
             patient=patient,
