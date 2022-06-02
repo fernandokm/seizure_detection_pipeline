@@ -207,7 +207,7 @@ let layout = {
         // type: 'buttons', 
         type : 'dropdown',
         showactive: false,
-        x : -0.5,
+        x : -0.6,
         xanchor: 'center',
         yanchor: 'top',
         buttons: real_crisis_buttons_beginning
@@ -216,7 +216,7 @@ let layout = {
         // type: 'buttons',
         type : 'dropdown',
         showactive: false,
-        x : -0.3,
+        x : -0.35,
         xanchor: 'center',
         yanchor: 'top',
         buttons: predicted_crisis_buttons_beginning
@@ -225,7 +225,7 @@ let layout = {
     annotations : [{
         xref: 'paper',
         yref: 'paper',
-        x: -0.5,
+        x: -0.6,
         xanchor: 'center',
         y: 1,
         yanchor: 'bottom',
@@ -234,7 +234,7 @@ let layout = {
     }, {
         xref: 'paper',
         yref: 'paper',
-        x: -0.3,
+        x: -0.35,
         xanchor: 'center',
         y: 1,
         yanchor: 'bottom',
