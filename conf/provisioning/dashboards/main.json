@@ -753,6 +753,83 @@
         "timeShift": null,
         "title": "",
         "type": "stat"
+      },
+      {
+        "datasource": "Postgres",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "displayName": "True negative",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 15,
+          "y": 13
+        },
+        "id": 18,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'crises_tn'",
+            "refId": "A",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "column"
+                }
+              ]
+            ],
+            "table": "metrics",
+            "timeColumn": "value",
+            "timeColumnType": "float8",
+            "where": [
+              {
+                "name": "$__unixEpochFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "stat"
       }
     ],
     "schemaVersion": 26,
@@ -769,5 +846,5 @@
     "timezone": "",
     "title": "Home",
     "uid": "y5AoxS8nz",
-    "version": 8
+    "version": 9
   }
