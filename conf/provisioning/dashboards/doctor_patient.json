@@ -40,7 +40,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1654155855467,
+  "iteration": 1654168278205,
   "links": [
     {
       "icon": "dashboard",
@@ -413,14 +413,14 @@
           },
           "margin": {
             "b": 30,
-            "l": 100,
+            "l": 200,
             "t": 10
           },
           "paper_bgcolor": "rgba(0,0,0,0)",
           "plot_bgcolor": "rgba(0,0,0,0)"
         },
         "onclick": "console.log(data)\nwindow.updateVariables({query:{'var-project':'test'}, partial: true})",
-        "script": "// This file is NOT used in Grafana, it is simply a copy paste of the Javascript script used in the LIME bar chart with a slider\n\n// The queries used to make it work are the following : \n\n// QUERY A : \n// SELECT * FROM \"autogen\".\"features\" WHERE (\"patient\" =~ /^$patient$/) AND $timeFilter\n\n\n// Max number of feature to plot\nvar max_feature_number = 6\n\n// argsort function found online and modified so that it sorts in descending order and by absolute values\nlet descending_abs_argsort = a => a.map((v, i) => [v, i]).sort((a, b) => Math.abs(b[0]) - Math.abs(a[0])).map(i => i[1])\n\n\n// function to convert a unix timestamp to \"HH:MM:SS\"\nfunction full_timestamp_to_hour(unix_time){\n    if (typeof unix_time == 'string') {\n        unix_time = parseInt(unix_time)\n    }\n    let date = new Date(unix_time)\n    // padStarts adds enough 0 at the beginning make sure the string length is 2 (ex : 7 --> 07)\n    return String(date.getHours()).padStart(2,0) + ':' + String(date.getMinutes()).padStart(2,0) + ':' + String(date.getSeconds()).padStart(2, 0)\n};\n\n\n\nconsole.log(data)\nlet all_fields = data.series[0].fields\nlet timestamp = []\nlet lime_values = []\nlet lime_names = []\n\nfor (let j = 0; j < all_fields.length; j++) {\n    if (all_fields[j].name == \"Time\") {\n        timestamp = all_fields[j].values.buffer;\n    };\n    if (all_fields[j].name.substring(0, 11) == 'lime_values') {\n        lime_values.push(all_fields[j].values.buffer);\n        lime_names.push(all_fields[j].name.substring(12))\n    };\n};\n\nfunction extract_ith_lime_values(lime_values, lime_names, i){\n    let x = [];\n    let y = [];\n    let color = []\n    for (let j = 0; j< lime_values.length; j++){\n        if (lime_values[j][i] != null) {\n            x.push(lime_values[j][i]);\n            y.push(lime_names[j]);\n            if (lime_values[j][i] > 0) {\n                color.push(\"#23c43e\");\n            } else {\n                color.push(\"#eb4034\");\n            };\n        };\n    };\n\n    // Now that  we retrieved all our data we want to sort it so we can keep only the most important features\n    let inds = descending_abs_argsort(x)\n    let sorted_x = []\n    let sorted_y = []\n    let sorted_color = []\n    for (let k=0; k<Math.min(x.length,max_feature_number); k++){\n        sorted_x.unshift(x[inds[k]])\n        sorted_y.unshift(y[inds[k]])\n        sorted_color.unshift(color[inds[k]])\n    }\n    return [sorted_x, sorted_y, sorted_color]\n};\n\nlet x_range_min = 1000\nlet x_range_max = -1000\nlet data_y = {};\nlet data_x = {}\nlet data_color = {};\nfor (let i = 0; i < timestamp.length; i++) {\n    let [x, y, color] = extract_ith_lime_values(lime_values, lime_names, i)\n    if (x.length > 0 ){\n        data_y[timestamp[i]] = y;\n        data_x[timestamp[i]] = x;\n        data_color[timestamp[i]] = color;\n        if (Math.max(...x) > x_range_max){\n            x_range_max = Math.max(...x)\n        };\n        if (Math.min(...x) < x_range_min){\n            x_range_min = Math.min(...x)\n        }\n    };\n};\n\n\n\nlet frames = [];\nlet unique_timestamps = Object.keys(data_y);\nfor (let i = 0; i < unique_timestamps.length; i++) {\n    frames.push({\n        name: unique_timestamps[i],\n        data: [{\n            x: data_x[unique_timestamps[i]],\n            y: data_y[unique_timestamps[i]],\n            marker: { color: data_color[unique_timestamps[i]] }\n        }],\n    })\n};\n\n\n\nlet sliderSteps = [];\nfor (let i = 0; i < unique_timestamps.length; i++) {\n    sliderSteps.push({\n        method: 'animate',\n        label: full_timestamp_to_hour(unique_timestamps[i]),\n        args: [[unique_timestamps[i]], {\n            mode: 'immediate',\n            transition: { duration: 300 },\n            frame: { duration: 300, redraw: false },\n        }]\n    });\n}\n\nlet layout = {\n    sliders: [{\n        steps: sliderSteps\n    }],\n    xaxis: { range: [x_range_min - 0.1 * (x_range_max - x_range_min), x_range_max + 0.1 * (x_range_max - x_range_min)] }\n};\n\n\n\nlet trace = {\n    x: data_x[unique_timestamps[0]],\n    y: data_y[unique_timestamps[0]],\n    type: \"bar\",\n    orientation: \"h\",\n    marker: {\n        color: data_color[unique_timestamps[0]]\n    }\n};\n\nreturn {\n    data: [trace],\n    layout: layout,\n    frames: frames\n};\n"
+        "script": "// This file is NOT used in Grafana, it is simply a copy paste of the Javascript script used in the LIME bar chart with a slider\n\n// The queries used to make it work are the following : \n\n// QUERY A : \n// SELECT * FROM \"autogen\".\"features\" WHERE (\"patient\" =~ /^$patient$/) AND $timeFilter\n\n\n// Max number of feature to plot\nvar max_feature_number = 6\n\n// argsort function found online and modified so that it sorts in descending order and by absolute values\nlet descending_abs_argsort = a => a.map((v, i) => [v, i]).sort((a, b) => Math.abs(b[0]) - Math.abs(a[0])).map(i => i[1])\n\n\n// function to convert a unix timestamp to \"HH:MM:SS\"\nfunction full_timestamp_to_hour(unix_time){\n    if (typeof unix_time == 'string') {\n        unix_time = parseInt(unix_time)\n    }\n    let date = new Date(unix_time)\n    // padStarts adds enough 0 at the beginning make sure the string length is 2 (ex : 7 --> 07)\n    return String(date.getHours()).padStart(2,0) + ':' + String(date.getMinutes()).padStart(2,0) + ':' + String(date.getSeconds()).padStart(2, 0)\n};\n\n\n\nconsole.log(data)\nlet all_fields = data.series[0].fields\nlet timestamp = []\nlet lime_values = []\nlet lime_strings = []\nlet feature_names = []\n\nfor (let j = 0; j < all_fields.length; j++) {\n    if (all_fields[j].name == \"Time\") {\n        timestamp = all_fields[j].values.buffer;\n    };\n    if (all_fields[j].name.substring(0, 11) == 'lime_values') {\n        lime_values.push(all_fields[j].values.buffer);\n        feature_names.push(all_fields[j].name.substring(12))\n    };\n};\nfor (let k =0 ; k < feature_names.length; k++) {\n    for (let j = 0; j < all_fields.length; j++) {\n        if (all_fields[j].name.substring(0, 11) == 'lime_string' & all_fields[j].name.substring(12) == feature_names[k]) {\n            lime_strings.push(all_fields[j].values.buffer);\n        };\n    };\n};\n\n\nfunction extract_ith_lime_values(lime_values, lime_strings, i){\n    let x = [];\n    let y = [];\n    let color = []\n    for (let j = 0; j< lime_values.length; j++){\n        if (lime_values[j][i] != null & lime_strings[j][i] != null) {\n            x.push(lime_values[j][i]);\n            y.push(lime_strings[j][i]);\n            if (lime_values[j][i] > 0) {\n                color.push(\"#23c43e\");\n            } else {\n                color.push(\"#eb4034\");\n            };\n        };\n    };\n\n    // Now that  we retrieved all our data we want to sort it so we can keep only the most important features\n    let inds = descending_abs_argsort(x)\n    let sorted_x = []\n    let sorted_y = []\n    let sorted_color = []\n    for (let k=0; k<Math.min(x.length,max_feature_number); k++){\n        sorted_x.unshift(x[inds[k]])\n        sorted_y.unshift(y[inds[k]])\n        sorted_color.unshift(color[inds[k]])\n    }\n    return [sorted_x, sorted_y, sorted_color]\n};\n\nlet x_range_min = 1000\nlet x_range_max = -1000\nlet data_y = {};\nlet data_x = {}\nlet data_color = {};\nfor (let i = 0; i < timestamp.length; i++) {\n    let [x, y, color] = extract_ith_lime_values(lime_values, lime_strings, i)\n    if (x.length > 0 ){\n        data_y[timestamp[i]] = y;\n        data_x[timestamp[i]] = x;\n        data_color[timestamp[i]] = color;\n        if (Math.max(...x) > x_range_max){\n            x_range_max = Math.max(...x)\n        };\n        if (Math.min(...x) < x_range_min){\n            x_range_min = Math.min(...x)\n        }\n    };\n};\n\n\n\nlet frames = [];\nlet unique_timestamps = Object.keys(data_y);\nfor (let i = 0; i < unique_timestamps.length; i++) {\n    frames.push({\n        name: unique_timestamps[i],\n        data: [{\n            x: data_x[unique_timestamps[i]],\n            y: data_y[unique_timestamps[i]],\n            marker: { color: data_color[unique_timestamps[i]] }\n        }],\n    })\n};\n\n\n\nlet sliderSteps = [];\nfor (let i = 0; i < unique_timestamps.length; i++) {\n    sliderSteps.push({\n        method: 'animate',\n        label: full_timestamp_to_hour(unique_timestamps[i]),\n        args: [[unique_timestamps[i]], {\n            mode: 'immediate',\n            transition: { duration: 300 },\n            frame: { duration: 300, redraw: false },\n        }]\n    });\n}\n\nlet layout = {\n    sliders: [{\n        steps: sliderSteps\n    }],\n    xaxis: { range: [x_range_min - 0.1 * (x_range_max - x_range_min), x_range_max + 0.1 * (x_range_max - x_range_min)] }\n};\n\n\n\nlet trace = {\n    x: data_x[unique_timestamps[0]],\n    y: data_y[unique_timestamps[0]],\n    type: \"bar\",\n    orientation: \"h\",\n    marker: {\n        color: data_color[unique_timestamps[0]]\n    }\n};\n\nreturn {\n    data: [trace],\n    layout: layout,\n    frames: frames\n};\n"
       },
       "pluginVersion": "7.3.4",
       "targets": [
@@ -478,8 +478,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "00004671_s007_t000",
-          "value": "00004671_s007_t000"
+          "text": "00005371_s001_t000",
+          "value": "00005371_s001_t000"
         },
         "datasource": "aura-influxDB",
         "definition": "",
@@ -711,12 +711,12 @@
     ]
   },
   "time": {
-    "from": "2012-08-04T15:53:26.900Z",
-    "to": "2012-08-04T15:55:01.100Z"
+    "from": "2009-01-26T09:51:04.000Z",
+    "to": "2009-01-26T10:20:04.996Z"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Patient | Doctor layout",
   "uid": "dctLyt",
-  "version": 6
+  "version": 9
 }

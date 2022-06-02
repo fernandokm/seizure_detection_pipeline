@@ -2,7 +2,7 @@
 
 // The queries used to make it work are the following : 
 
-// QUERY A (InfluxDB, Format as Table)
+// QUERY A : 
 // SELECT * FROM "autogen"."features" WHERE ("patient" =~ /^$patient$/) AND $timeFilter
 
 
@@ -29,7 +29,8 @@ console.log(data)
 let all_fields = data.series[0].fields
 let timestamp = []
 let lime_values = []
-let lime_names = []
+let lime_strings = []
+let feature_names = []
 
 for (let j = 0; j < all_fields.length; j++) {
     if (all_fields[j].name == "Time") {
@@ -37,18 +38,26 @@ for (let j = 0; j < all_fields.length; j++) {
     };
     if (all_fields[j].name.substring(0, 11) == 'lime_values') {
         lime_values.push(all_fields[j].values.buffer);
-        lime_names.push(all_fields[j].name.substring(12))
+        feature_names.push(all_fields[j].name.substring(12))
+    };
+};
+for (let k =0 ; k < feature_names.length; k++) {
+    for (let j = 0; j < all_fields.length; j++) {
+        if (all_fields[j].name.substring(0, 11) == 'lime_string' & all_fields[j].name.substring(12) == feature_names[k]) {
+            lime_strings.push(all_fields[j].values.buffer);
+        };
     };
 };
 
-function extract_ith_lime_values(lime_values, lime_names, i){
+
+function extract_ith_lime_values(lime_values, lime_strings, i){
     let x = [];
     let y = [];
     let color = []
     for (let j = 0; j< lime_values.length; j++){
-        if (lime_values[j][i] != null) {
+        if (lime_values[j][i] != null & lime_strings[j][i] != null) {
             x.push(lime_values[j][i]);
-            y.push(lime_names[j]);
+            y.push(lime_strings[j][i]);
             if (lime_values[j][i] > 0) {
                 color.push("#23c43e");
             } else {
@@ -76,7 +85,7 @@ let data_y = {};
 let data_x = {}
 let data_color = {};
 for (let i = 0; i < timestamp.length; i++) {
-    let [x, y, color] = extract_ith_lime_values(lime_values, lime_names, i)
+    let [x, y, color] = extract_ith_lime_values(lime_values, lime_strings, i)
     if (x.length > 0 ){
         data_y[timestamp[i]] = y;
         data_x[timestamp[i]] = x;
