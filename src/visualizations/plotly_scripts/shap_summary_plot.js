@@ -124,7 +124,7 @@ function get_trace_for_one_feature(not_shuffled_shaps, not_shuffled_values, pos,
     var resized_ys = [];
     var row_height = 0.4;
     for (i = 0; i < shaps.length; i++) {
-        negative_shaps.push(-1 * shaps[i]);
+        negative_shaps.push(shaps[i]);
         resized_ys.push(ys[i] * (0.9 * row_height / (Math.max(...ys) + 1)) + pos);
     };
 
@@ -245,7 +245,7 @@ for (i = 0; i < final_number_of_plots; i++) {
 
 // Shap values are actually inverted when plotting so we take the 
 // negative of the max minus a small percentage of the range
-var x_annotation_pos = -1 * max_x_shaps_value - 0.1 * (max_x_shaps_value - min_x_shaps_value)
+var x_annotation_pos = min_x_shaps_value - 0.1 * (max_x_shaps_value - min_x_shaps_value)
 
 var traces = []
 var annotations = []
