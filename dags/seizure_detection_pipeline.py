@@ -282,12 +282,13 @@ def dag_seizure_detection_pipeline():
         **DEFAULT_ARGS,
     },
     dag_id="model_pipeline",
-    description="Start the whole seizure detection pipeline",
+    description="Start the whole model pipeline",
     start_date=START_DATE,
     schedule_interval=SCHEDULE_INTERVAL,
     concurrency=CONCURRENCY,
 )
 def dag_model_pipeline():
+    """Generates predictions and computes metrics and explanations"""
     def load_models(model_paths: dict):
         import pickle
 
@@ -434,6 +435,7 @@ def dag_model_pipeline():
     concurrency=CONCURRENCY,
 )
 def dag_grafana_pipeline():
+    """Configures Grafana and saves required data do influxdb and postgres"""
     @task()
     def t_get_initial_parameters() -> dict:
         import pandas as pd
