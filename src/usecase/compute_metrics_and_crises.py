@@ -147,9 +147,12 @@ def compute_metrics_and_crises(cons_folder: str = 'output/preds-v0_6',
 
         df = pd.read_csv(cons_file, parse_dates=['timestamp'])
         session_durations[(patient_id, session_id)] = df.shape[0]
-        df['timestamp'] = df['timestamp'].values.astype(np.int64) / 10**9
+        df['timestamp'] = df['timestamp'].values.astype(np.int64) / 10**9  # timestamp in seconds
         if 'predicted_label' not in df:
             df['predicted_label'] = np.nan
+
+        # ensure the dataframe is sorted in order to appropriately detect
+        # when a seizure started and ended
         df.sort_values('interval_start_time')
 
         sessions.append({
@@ -161,6 +164,7 @@ def compute_metrics_and_crises(cons_folder: str = 'output/preds-v0_6',
         })
 
         def get_crisis(start: int, end: int, model: Optional[str] = None) -> dict:
+            """Creates a dict with seizure information"""
             return {
                 'patient_id': patient_id,
                 'session_id': session_id,
@@ -177,6 +181,7 @@ def compute_metrics_and_crises(cons_folder: str = 'output/preds-v0_6',
         for model in models:
             df_model = df[df['model'] == model]
 
+            # compute per-prediction metrics for the current patient/session
             df_preds = df_model.dropna(subset=['label', 'predicted_label'])
             if not df_preds.empty:
                 tn, fp, fn, tp = confusion_matrix(df_preds['label'], df_preds['predicted_label'], labels=[0, 1]).ravel()
@@ -223,6 +228,8 @@ def compute_metrics_and_crises(cons_folder: str = 'output/preds-v0_6',
                     })
         print(f'[{i}] Processed {cons_file} - total stats: {len(real_crises)} real crises, {len(pred_crises)} predicted crises')
 
+    # compute metrics for each model over the whole dataset
+    # (not individually for each patient/session)
     tagged_crises = []
     for model in models:
         update_with_derived_metrics(global_metrics[model])
@@ -422,8 +429,7 @@ def compute_metrics(real_crises: List[dict],
        true positive (tp), true negative (tn), false positive (fp) or
        false negative (fn). A seizure is classified as a true positive
        if at least 75% of it was predicted by the model.
-     - A dict of tp/tn/fp/fn metrics computed over individual predictions
-       and crises_tp/crises_tn/crises_fp/crises_fn metrics computed over
+     - A dict of crises_tp/crises_tn/crises_fp/crises_fn metrics computed over
        each seizure (as explained above).
     """
     tagged_crises = []

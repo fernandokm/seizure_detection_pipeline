@@ -61,24 +61,35 @@ def explanation_pipeline(models: dict, db: pd.DataFrame) -> None:
     db.loc[:, shap_columns] = np.nan
     db.loc[:, lime_columns] = np.nan
     for model_name, model in models.items():
+        # identify which rows in db relate to the current model
+        # AND have no NaN values.
         x = db.loc[:, model_columns]
         row_mask = (db['model'] == model_name) & ~x.isna().any(axis=1) & ~np.isinf(x).any(axis=1)
         if not row_mask.any():
             continue
+
+        # compute shap explanations
         explainer_patient = shap.TreeExplainer(model)
         shap_values_graf = explainer_patient.shap_values(db.loc[row_mask, model_columns])
         db.loc[row_mask, shap_columns] = shap_values_graf[1]
         print('Computed shap values for model', model_name)
 
+        # compute lime explanations
         explainer_lime = lime_tabular.LimeTabularExplainer(training_data=db.loc[row_mask, model_columns].values,
                                                            mode='classification',
                                                            class_names=['no seizure', 'seizure'],
                                                            feature_names=model_columns)
         prev_label = np.nan
         prev_pred_label = np.nan
+        # iterate through the relevant rows
+        # (np.flatnonzero(row_mask) returns the indices of db rows
+        # which pertain to the current model are are not NaN)
         for i in np.flatnonzero(row_mask):
             row = db.iloc[i]
             sample = row.loc[model_columns].values
+
+            # Only generate an explanation if db[i] has label/predicted_label == 1 (seizure)
+            # and the previous row had label/predicted label != 1 (not seizure)
             if (prev_label != 1 and row['label'] == 1) or (prev_pred_label != 1 and row['predicted_label'] == 1):
                 exp = explainer_lime.explain_instance(
                     sample, model.predict_proba, labels=(0, 1), num_features=len(model_columns), num_samples=2000)
