@@ -1,850 +1,851 @@
 {
     "annotations": {
-        "list": [
-            {
-                "builtIn": 1,
-                "datasource": "-- Grafana --",
-                "enable": true,
-                "hide": true,
-                "iconColor": "rgba(0, 211, 255, 1)",
-                "name": "Annotations & Alerts",
-                "type": "dashboard"
-            }
-        ]
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": "-- Grafana --",
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
     },
     "editable": true,
     "gnetId": null,
     "graphTooltip": 0,
+    "id": null,
     "links": [],
     "panels": [
-        {
-            "aliasColors": {},
-            "cacheTimeout": null,
-            "css_data": "\nli {\nlist-style-type: none;\npadding: 7px;\nmargin: 3px;\nbackground-color: #f7f8fa;\nborder-radius: 3px;\ncursor: pointer;\n\n}\nli a {\ndisplay: block;\ntext-decoration: none;\ncolor: #464c54;\n}\n\nli:hover {\nbackground-color: #e9edf2;\n}\n\n.session-subtitle {\ncolor: #7b8087;\nfont-size: 10px;\n}",
-            "datasource": null,
-            "doInit": {},
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {}
-                },
-                "overrides": []
-            },
-            "format": "short",
-            "gridPos": {
-                "h": 19,
-                "w": 12,
-                "x": 0,
-                "y": 0
-            },
-            "handleMetric": {},
-            "html_data": "\n    <div class=\"panel-container\">\n        <div class=\"panel-content\">\n            <div class=\"panel-content-text\">\n                <div class=\"panel-content-text-row\">\n\n                <ul>\n                    <li><a href='/d/dstLyt/patient-data-scientist-layout?orgId=1&var-patient=00004671_s007_t000&from=1344095463000&to=1344097392872'>Kenyetta (00004671_s007_t000)<div class='session-subtitle'> 39 vraies crises, 0 crises pr\u00e9dites</div></a></li><li><a href='/d/dstLyt/patient-data-scientist-layout?orgId=1&var-patient=00005371_s001_t000&from=1232963464000&to=1232965204996'>Jeremian (00005371_s001_t000)<div class='session-subtitle'> 1 vraies crises, 20 crises pr\u00e9dites</div></a></li><li><a href='/d/dstLyt/patient-data-scientist-layout?orgId=1&var-patient=00007633_s003_t007&from=1373400300000&to=1373401237936'>Geoff (00007633_s003_t007)<div class='session-subtitle'> 0 vraies crises, 0 crises pr\u00e9dites</div></a></li><li><a href='/d/dstLyt/patient-data-scientist-layout?orgId=1&var-patient=00009578_s002_t001&from=1362067392000&to=1362067408996'>Rigoberto (00009578_s002_t001)<div class='session-subtitle'> 0 vraies crises, 0 crises pr\u00e9dites</div></a></li><li><a href='/d/dstLyt/patient-data-scientist-layout?orgId=1&var-patient=00009578_s006_t001&from=1362219077000&to=1362219098994'>Kirra (00009578_s006_t001)<div class='session-subtitle'> 0 vraies crises, 0 crises pr\u00e9dites</div></a></li>\n                </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n    ",
-            "id": 6,
-            "interval": null,
-            "js_code": "",
-            "js_init_code": "",
-            "links": [],
-            "maxDataPoints": 3,
-            "nullPointMode": "connected",
-            "pluginVersion": "7.3.4",
-            "targets": [
-                {
-                    "queryType": "randomWalk",
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "Sessions",
-            "type": "aidanmountford-html-panel"
+      {
+        "aliasColors": {},
+        "cacheTimeout": null,
+        "css_data": "\nli {\nlist-style-type: none;\npadding: 7px;\nmargin: 3px;\nbackground-color: #f7f8fa;\nborder-radius: 3px;\ncursor: pointer;\n\n}\nli a {\ndisplay: block;\ntext-decoration: none;\ncolor: #464c54;\n}\n\nli:hover {\nbackground-color: #e9edf2;\n}\n\n.session-subtitle {\ncolor: #7b8087;\nfont-size: 10px;\n}",
+        "datasource": null,
+        "doInit": {},
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
         },
-        {
-            "datasource": null,
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {}
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 2,
-                "w": 6,
-                "x": 12,
-                "y": 0
-            },
-            "id": 16,
-            "options": {
-                "content": "\n### Statistics per prediction",
-                "mode": "markdown"
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
-                {
-                    "queryType": "randomWalk",
-                    "refId": "A"
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "text"
+        "format": "short",
+        "gridPos": {
+          "h": 19,
+          "w": 12,
+          "x": 0,
+          "y": 0
         },
-        {
-            "cacheTimeout": null,
-            "datasource": "Postgres",
-            "doInit": {},
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {
-                        "align": null,
-                        "filterable": false
-                    },
-                    "displayName": "$__cell_0",
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            },
-                            {
-                                "color": "red",
-                                "value": 80
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 10,
-                "w": 6,
-                "x": 18,
-                "y": 0
-            },
-            "handleMetric": {},
-            "id": 8,
-            "interval": null,
-            "links": [],
-            "maxDataPoints": 3,
-            "options": {
-                "displayMode": "gradient",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "fields": "",
-                    "values": true
-                },
-                "showUnfilled": true
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
-                {
-                    "format": "table",
-                    "group": [],
-                    "metricColumn": "none",
-                    "queryType": "randomWalk",
-                    "rawQuery": true,
-                    "rawSql": "SELECT metric, value FROM metrics\nWHERE value != value + 1 AND (metric != 'tn' AND metric != 'tp' AND metric != 'fn' AND metric != 'fp' AND metric != 'crises_tp' AND metric != 'crises_fn' AND metric != 'crises_fp' AND metric != 'shap_expected_value')",
-                    "refId": "A",
-                    "select": [
-                        [
-                            {
-                                "params": [
-                                    "lime_coefficient"
-                                ],
-                                "type": "column"
-                            }
-                        ]
-                    ],
-                    "table": "lime_barchart",
-                    "timeColumn": "\"timestamp\"",
-                    "timeColumnType": "timestamp",
-                    "where": [
-                        {
-                            "name": "$__timeFilter",
-                            "params": [],
-                            "type": "macro"
-                        }
-                    ]
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "bargauge"
+        "handleMetric": {},
+        "html_data": "\n    <div class=\"panel-container\">\n        <div class=\"panel-content\">\n            <div class=\"panel-content-text\">\n                <div class=\"panel-content-text-row\">\n\n                <ul>\n                    <li><a href='/d/dstLyt/patient-data-scientist-layout?orgId=1&var-patient=00004671_s007_t000&from=1344095463000&to=1344097392872'>Kenyetta (00004671_s007_t000)<div class='session-subtitle'> 39 vraies crises, 0 crises prédites</div></a></li><li><a href='/d/dstLyt/patient-data-scientist-layout?orgId=1&var-patient=00005371_s001_t000&from=1232963464000&to=1232965204996'>Jeremian (00005371_s001_t000)<div class='session-subtitle'> 1 vraies crises, 20 crises prédites</div></a></li><li><a href='/d/dstLyt/patient-data-scientist-layout?orgId=1&var-patient=00007633_s003_t007&from=1373400300000&to=1373401237936'>Geoff (00007633_s003_t007)<div class='session-subtitle'> 0 vraies crises, 0 crises prédites</div></a></li><li><a href='/d/dstLyt/patient-data-scientist-layout?orgId=1&var-patient=00009578_s002_t001&from=1362067392000&to=1362067408996'>Rigoberto (00009578_s002_t001)<div class='session-subtitle'> 0 vraies crises, 0 crises prédites</div></a></li><li><a href='/d/dstLyt/patient-data-scientist-layout?orgId=1&var-patient=00009578_s006_t001&from=1362219077000&to=1362219098994'>Kirra (00009578_s006_t001)<div class='session-subtitle'> 0 vraies crises, 0 crises prédites</div></a></li>\n                </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n    ",
+        "id": 6,
+        "interval": null,
+        "js_code": "",
+        "js_init_code": "",
+        "links": [],
+        "maxDataPoints": 3,
+        "nullPointMode": "connected",
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "queryType": "randomWalk",
+            "refId": "A"
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "Sessions",
+        "type": "aidanmountford-html-panel"
+      },
+      {
+        "datasource": null,
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
         },
-        {
-            "datasource": "Postgres",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "displayName": "True positive",
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "blue",
-                                "value": null
-                            },
-                            {
-                                "color": "red",
-                                "value": 80
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 3,
-                "w": 3,
-                "x": 12,
-                "y": 2
-            },
-            "id": 10,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "textMode": "auto"
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
-                {
-                    "format": "table",
-                    "group": [],
-                    "metricColumn": "none",
-                    "queryType": "randomWalk",
-                    "rawQuery": true,
-                    "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'tp'",
-                    "refId": "A",
-                    "select": [
-                        [
-                            {
-                                "params": [
-                                    "value"
-                                ],
-                                "type": "column"
-                            }
-                        ]
-                    ],
-                    "table": "metrics",
-                    "timeColumn": "value",
-                    "timeColumnType": "float8",
-                    "where": [
-                        {
-                            "name": "$__unixEpochFilter",
-                            "params": [],
-                            "type": "macro"
-                        }
-                    ]
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "stat"
+        "gridPos": {
+          "h": 2,
+          "w": 6,
+          "x": 12,
+          "y": 0
         },
-        {
-            "datasource": "Postgres",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "displayName": "False positive",
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "blue",
-                                "value": null
-                            },
-                            {
-                                "color": "red",
-                                "value": 80
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 3,
-                "w": 3,
-                "x": 15,
-                "y": 2
-            },
-            "id": 9,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "textMode": "auto"
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
-                {
-                    "format": "table",
-                    "group": [],
-                    "metricColumn": "none",
-                    "queryType": "randomWalk",
-                    "rawQuery": true,
-                    "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'fp'",
-                    "refId": "A",
-                    "select": [
-                        [
-                            {
-                                "params": [
-                                    "value"
-                                ],
-                                "type": "column"
-                            }
-                        ]
-                    ],
-                    "table": "metrics",
-                    "timeColumn": "value",
-                    "timeColumnType": "float8",
-                    "where": [
-                        {
-                            "name": "$__unixEpochFilter",
-                            "params": [],
-                            "type": "macro"
-                        }
-                    ]
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "stat"
+        "id": 16,
+        "options": {
+          "content": "\n### Statistics per prediction",
+          "mode": "markdown"
         },
-        {
-            "datasource": "Postgres",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "displayName": "False negative",
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "blue",
-                                "value": null
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "queryType": "randomWalk",
+            "refId": "A"
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "text"
+      },
+      {
+        "cacheTimeout": null,
+        "datasource": "Postgres",
+        "doInit": {},
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": null,
+              "filterable": false
             },
-            "gridPos": {
-                "h": 3,
-                "w": 3,
-                "x": 12,
-                "y": 5
-            },
-            "id": 11,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "textMode": "auto"
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
+            "displayName": "$__cell_0",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
                 {
-                    "format": "table",
-                    "group": [],
-                    "metricColumn": "none",
-                    "queryType": "randomWalk",
-                    "rawQuery": true,
-                    "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'fn'",
-                    "refId": "A",
-                    "select": [
-                        [
-                            {
-                                "params": [
-                                    "value"
-                                ],
-                                "type": "column"
-                            }
-                        ]
-                    ],
-                    "table": "metrics",
-                    "timeColumn": "value",
-                    "timeColumnType": "float8",
-                    "where": [
-                        {
-                            "name": "$__unixEpochFilter",
-                            "params": [],
-                            "type": "macro"
-                        }
-                    ]
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
                 }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "stat"
+              ]
+            }
+          },
+          "overrides": []
         },
-        {
-            "datasource": "Postgres",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "displayName": "True negative",
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "blue",
-                                "value": null
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 3,
-                "w": 3,
-                "x": 15,
-                "y": 5
-            },
-            "id": 4,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "textMode": "auto"
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
-                {
-                    "format": "table",
-                    "group": [],
-                    "metricColumn": "none",
-                    "queryType": "randomWalk",
-                    "rawQuery": true,
-                    "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'tn'",
-                    "refId": "A",
-                    "select": [
-                        [
-                            {
-                                "params": [
-                                    "value"
-                                ],
-                                "type": "column"
-                            }
-                        ]
-                    ],
-                    "table": "metrics",
-                    "timeColumn": "value",
-                    "timeColumnType": "float8",
-                    "where": [
-                        {
-                            "name": "$__unixEpochFilter",
-                            "params": [],
-                            "type": "macro"
-                        }
-                    ]
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "stat"
+        "gridPos": {
+          "h": 10,
+          "w": 6,
+          "x": 18,
+          "y": 0
         },
-        {
-            "datasource": null,
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {}
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 2,
-                "w": 6,
-                "x": 12,
-                "y": 8
-            },
-            "id": 17,
-            "options": {
-                "content": "\n### Statistics per seizure",
-                "mode": "markdown"
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
-                {
-                    "queryType": "randomWalk",
-                    "refId": "A"
-                }
+        "handleMetric": {},
+        "id": 8,
+        "interval": null,
+        "links": [],
+        "maxDataPoints": 3,
+        "options": {
+          "displayMode": "gradient",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
             ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "text"
+            "fields": "",
+            "values": true
+          },
+          "showUnfilled": true
         },
-        {
-            "datasource": "Postgres",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "displayName": "True positive",
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "blue",
-                                "value": null
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 3,
-                "w": 3,
-                "x": 12,
-                "y": 10
-            },
-            "id": 14,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "textMode": "auto"
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT metric, value FROM metrics\nWHERE value != value + 1 AND (metric != 'tn' AND metric != 'tp' AND metric != 'fn' AND metric != 'crises_tn' AND metric != 'fp' AND metric != 'crises_tp' AND metric != 'crises_fn' AND metric != 'crises_fp' AND metric != 'shap_expected_value')",
+            "refId": "A",
+            "select": [
+              [
                 {
-                    "format": "table",
-                    "group": [],
-                    "metricColumn": "none",
-                    "queryType": "randomWalk",
-                    "rawQuery": true,
-                    "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'crises_tp'",
-                    "refId": "A",
-                    "select": [
-                        [
-                            {
-                                "params": [
-                                    "value"
-                                ],
-                                "type": "column"
-                            }
-                        ]
-                    ],
-                    "table": "metrics",
-                    "timeColumn": "value",
-                    "timeColumnType": "float8",
-                    "where": [
-                        {
-                            "name": "$__unixEpochFilter",
-                            "params": [],
-                            "type": "macro"
-                        }
-                    ]
+                  "params": [
+                    "lime_coefficient"
+                  ],
+                  "type": "column"
                 }
+              ]
             ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "stat"
+            "table": "lime_barchart",
+            "timeColumn": "\"timestamp\"",
+            "timeColumnType": "timestamp",
+            "where": [
+              {
+                "name": "$__timeFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "bargauge"
+      },
+      {
+        "datasource": "Postgres",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "displayName": "True positive",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
         },
-        {
-            "datasource": "Postgres",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "displayName": "False positive",
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "blue",
-                                "value": null
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 3,
-                "w": 3,
-                "x": 15,
-                "y": 10
-            },
-            "id": 13,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "textMode": "auto"
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
-                {
-                    "format": "table",
-                    "group": [],
-                    "metricColumn": "none",
-                    "queryType": "randomWalk",
-                    "rawQuery": true,
-                    "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'crises_fp'",
-                    "refId": "A",
-                    "select": [
-                        [
-                            {
-                                "params": [
-                                    "value"
-                                ],
-                                "type": "column"
-                            }
-                        ]
-                    ],
-                    "table": "metrics",
-                    "timeColumn": "value",
-                    "timeColumnType": "float8",
-                    "where": [
-                        {
-                            "name": "$__unixEpochFilter",
-                            "params": [],
-                            "type": "macro"
-                        }
-                    ]
-                }
-            ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "stat"
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 12,
+          "y": 2
         },
-        {
-            "datasource": "Postgres",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "displayName": "False negative",
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "blue",
-                                "value": null
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 3,
-                "w": 3,
-                "x": 12,
-                "y": 13
-            },
-            "id": 12,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "textMode": "auto"
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
-                {
-                    "format": "table",
-                    "group": [],
-                    "metricColumn": "none",
-                    "queryType": "randomWalk",
-                    "rawQuery": true,
-                    "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'crises_fn'",
-                    "refId": "A",
-                    "select": [
-                        [
-                            {
-                                "params": [
-                                    "value"
-                                ],
-                                "type": "column"
-                            }
-                        ]
-                    ],
-                    "table": "metrics",
-                    "timeColumn": "value",
-                    "timeColumnType": "float8",
-                    "where": [
-                        {
-                            "name": "$__unixEpochFilter",
-                            "params": [],
-                            "type": "macro"
-                        }
-                    ]
-                }
+        "id": 10,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
             ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "stat"
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
         },
-        {
-            "datasource": "Postgres",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {},
-                    "displayName": "True negative",
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "blue",
-                                "value": null
-                            }
-                        ]
-                    }
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 3,
-                "w": 3,
-                "x": 15,
-                "y": 13
-            },
-            "id": 18,
-            "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "reduceOptions": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "fields": "",
-                    "values": false
-                },
-                "textMode": "auto"
-            },
-            "pluginVersion": "7.3.4",
-            "targets": [
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'tp'",
+            "refId": "A",
+            "select": [
+              [
                 {
-                    "format": "table",
-                    "group": [],
-                    "metricColumn": "none",
-                    "queryType": "randomWalk",
-                    "rawQuery": true,
-                    "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'crises_tn'",
-                    "refId": "A",
-                    "select": [
-                        [
-                            {
-                                "params": [
-                                    "value"
-                                ],
-                                "type": "column"
-                            }
-                        ]
-                    ],
-                    "table": "metrics",
-                    "timeColumn": "value",
-                    "timeColumnType": "float8",
-                    "where": [
-                        {
-                            "name": "$__unixEpochFilter",
-                            "params": [],
-                            "type": "macro"
-                        }
-                    ]
+                  "params": [
+                    "value"
+                  ],
+                  "type": "column"
                 }
+              ]
             ],
-            "timeFrom": null,
-            "timeShift": null,
-            "title": "",
-            "type": "stat"
-        }
+            "table": "metrics",
+            "timeColumn": "value",
+            "timeColumnType": "float8",
+            "where": [
+              {
+                "name": "$__unixEpochFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": "Postgres",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "displayName": "False positive",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 15,
+          "y": 2
+        },
+        "id": 9,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'fp'",
+            "refId": "A",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "column"
+                }
+              ]
+            ],
+            "table": "metrics",
+            "timeColumn": "value",
+            "timeColumnType": "float8",
+            "where": [
+              {
+                "name": "$__unixEpochFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": "Postgres",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "displayName": "False negative",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 12,
+          "y": 5
+        },
+        "id": 11,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'fn'",
+            "refId": "A",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "column"
+                }
+              ]
+            ],
+            "table": "metrics",
+            "timeColumn": "value",
+            "timeColumnType": "float8",
+            "where": [
+              {
+                "name": "$__unixEpochFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": "Postgres",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "displayName": "True negative",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 15,
+          "y": 5
+        },
+        "id": 4,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'tn'",
+            "refId": "A",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "column"
+                }
+              ]
+            ],
+            "table": "metrics",
+            "timeColumn": "value",
+            "timeColumnType": "float8",
+            "where": [
+              {
+                "name": "$__unixEpochFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": null,
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 2,
+          "w": 6,
+          "x": 12,
+          "y": 8
+        },
+        "id": 17,
+        "options": {
+          "content": "\n### Statistics per seizure",
+          "mode": "markdown"
+        },
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "queryType": "randomWalk",
+            "refId": "A"
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "text"
+      },
+      {
+        "datasource": "Postgres",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "displayName": "True positive",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 12,
+          "y": 10
+        },
+        "id": 14,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'crises_tp'",
+            "refId": "A",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "column"
+                }
+              ]
+            ],
+            "table": "metrics",
+            "timeColumn": "value",
+            "timeColumnType": "float8",
+            "where": [
+              {
+                "name": "$__unixEpochFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": "Postgres",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "displayName": "False positive",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 15,
+          "y": 10
+        },
+        "id": 13,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'crises_fp'",
+            "refId": "A",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "column"
+                }
+              ]
+            ],
+            "table": "metrics",
+            "timeColumn": "value",
+            "timeColumnType": "float8",
+            "where": [
+              {
+                "name": "$__unixEpochFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": "Postgres",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "displayName": "False negative",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 12,
+          "y": 13
+        },
+        "id": 12,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'crises_fn'",
+            "refId": "A",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "column"
+                }
+              ]
+            ],
+            "table": "metrics",
+            "timeColumn": "value",
+            "timeColumnType": "float8",
+            "where": [
+              {
+                "name": "$__unixEpochFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "stat"
+      },
+      {
+        "datasource": "Postgres",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {},
+            "displayName": "True negative",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 3,
+          "w": 3,
+          "x": 15,
+          "y": 13
+        },
+        "id": 18,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "mean"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "textMode": "auto"
+        },
+        "pluginVersion": "7.3.4",
+        "targets": [
+          {
+            "format": "table",
+            "group": [],
+            "metricColumn": "none",
+            "queryType": "randomWalk",
+            "rawQuery": true,
+            "rawSql": "SELECT metric, value FROM metrics \nWHERE metric = 'crises_tn'",
+            "refId": "A",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "column"
+                }
+              ]
+            ],
+            "table": "metrics",
+            "timeColumn": "value",
+            "timeColumnType": "float8",
+            "where": [
+              {
+                "name": "$__unixEpochFilter",
+                "params": [],
+                "type": "macro"
+              }
+            ]
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "",
+        "type": "stat"
+      }
     ],
     "schemaVersion": 26,
     "style": "dark",
     "tags": [],
     "templating": {
-        "list": []
+      "list": []
     },
     "time": {
-        "from": "now-6h",
-        "to": "now"
+      "from": "now-6h",
+      "to": "now"
     },
     "timepicker": {},
     "timezone": "",
     "title": "Home",
     "uid": "y5AoxS8nz",
     "version": 9
-}
+  }
