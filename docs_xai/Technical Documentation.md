@@ -32,7 +32,7 @@ __Doctors__ : The second stakeholder is the doctors team, we need to provide the
 
 
 ## 2- General architecture of the project 
-![General architecture](Pipelinedetaille.PNG)
+![General architecture](imgs/pipelinedetaille.PNG)
 
 
 <p><center> Figure.1: General architecture of the project </center></p><html>
@@ -66,7 +66,7 @@ We used Grafana as our visualization tool since it is the tool used by Aura and 
 
 ## 3- Detailed architecture of each entity
 
-![base de donnée intermédiare](Pipeline_general.PNG)
+![base de donnée intermédiare](imgs/Pipeline_general.PNG)
 
 <p><center> Figure.2: Detailed architecture of each entity </center></p><html>
 
@@ -108,7 +108,7 @@ You do not have to change anything in the code because [*Shap.TreeExplainer*](ht
 
  In this layout, we decided to put the list of patients that will allow the user to select the patient. In order to visualize the graphs of the features and the graphs of the explainability linked to this prediction. As well as the statistics related to the global performance of the model.
 
- > ![Home layout  ](DashbordHome.jpeg)
+ > ![Home layout  ](imgs/DashbordHome.jpeg)
 
 <p><center> Figure.3: Home layout  </center></p><html>
 
@@ -119,7 +119,7 @@ You do not have to change anything in the code because [*Shap.TreeExplainer*](ht
 
 #### 3-4-2  Data scientist layout
 
-![Data scientist layout](DashbordDataScientist1.jpeg)
+![Data scientist layout](imgs/DashbordDataScientist1.jpeg)
 
 <p><center> Figure.4: Data scientist layout  </center></p><html>
 
@@ -127,28 +127,28 @@ In this Dashboard we have put all the graphs related to the features and that wi
 - ***Navigation bar:***  
 >
 
-![Navigation bar ](BarreDeNavigationDsc.jpeg)
+![Navigation bar ](imgs/BarreDeNavigationDsc.jpeg)
 <p><center> Figure.5: Navigation bar </center></p><html>
  This bar consists of a first button 'session' which indicates the name of the active session of the patient with a drop-down list to modify it. A second drop-down list with all the features to choose the main feature (the graphs will be modified according to the choice of this feature). Then a third drop-down list of features to choose the feature with which you want to study the correlation. The buttons 'Real seizures' and 'Predicted seizures' allow us to display on the first graph the interval of the predicted seizure and that of the real seizure. Finally, in the right end we have the buttons that allow us to access the home dashboard and the one dedicated to the doctors.
 
  - ***Statistics sheet:*** 
   In this sheet we have the key indicators of the model.
 
-![Statistics sheet ](FicheStat.jpeg)
+![Statistics sheet ](imgs/FicheStat.jpeg)
 <p><center> Figure.6: Statistics sheet  </center></p><html>
 
 
 - ***graphic representations :*** 
 
 > 1. *Evolution of the feature as a function of time.*
-> ![modified_csi in function of time ](grapheFeature.jpeg)
+> ![modified_csi in function of time ](imgs/grapheFeature.jpeg)
 <p><center> Figure.7: evolution of feature 'modified_csi' as fonction of time   </center></p><html>
 
 This is the first graph of the Dashbord, we can zoom on this graph in order to select the window of time that we want to visualize, as well as we can display the duration of each crisis by passing the mouse on the real crisis that is represented by red lines.
 
 
 > 2. [*Shap waterfall plot*:](https://shap-lrjball.readthedocs.io/en/latest/generated/shap.waterfall_plot.html#:~:text=The%20waterfall%20plot%20is%20designed%20to%20visually%20display,prediction%20given%20the%20evidence%20of%20all%20the%20features.) CeThe graph is designed to display how the Shap value of each feature modifies the output, in other words it highlights the importance of the features. We can select the feature to study in the 1st button of the navigation bar.
-> ![Shap waterfall plot ](shap_waterfall.png)
+> ![Shap waterfall plot ](imgs/shap_waterfall.png)
 <p><center> Figure.8: Shap waterfall plot   </center></p><html>
 
 
@@ -158,18 +158,18 @@ This is the first graph of the Dashbord, we can zoom on this graph in order to s
 > The button 'Real seizures' allows us to display the moment of the beginning of the real seizure, and the button 'Predicted seizures' allows us to display the moment of the beginning of the predicted seizure.
 
 > 3. *Features dependency:* This graph represents the feature selected in the 'main feature' button according to the second selected feature in order to see if there is a dependency relationship between the two features. 
-> ![Correlation plot ](grapheCorrelation.jpeg)
+> ![Correlation plot ](imgs/grapheCorrelation.jpeg)
 <p><center> Figure.9:Correlation plot   </center></p><html>
 
 > 4. [*Shap summary plot:*](https://shap-lrjball.readthedocs.io/en/latest/generated/shap.summary_plot.html) It creates a beeswarm plot, the shap values are represented on the x axis, the feature names on the y axis and each point is colored with a gradient from red to blue to represent the value of the feature. In this plot we will put the features that have the highest variance and it will not depend on the choice of the feature in the selection bar.
 
-> ![Shap summary plot ](summaryPlot.jpeg)
+> ![Shap summary plot ](imgs/summaryPlot.jpeg)
 
 <p><center> Figure.10: Summary plot avec notre modèle </center></p><html>
 
 #### 3-4-3 Dashbord médecin 
 
-> ![Doctor layout  ](DashbordDactor.jpeg)
+> ![Doctor layout  ](imgs/DashbordDactor.jpeg)
 
 
 <p><center> Figure.11: Doctor Dashbord </center></p><html>
@@ -179,13 +179,13 @@ In this Dashbord we have put all the graphs that can allow doctors to make an an
 
 - ***Graphical representations:*** 
 > 1. *Evolution of ECGs :* 
-> ![ECG plot ](ECG.PNG)
+> ![ECG plot ](imgs/ECG.PNG)
    <p><center> Figure.12: ECG diagram </center></p><html>
 In this plot we have deactivated the display of the real and predicted seizure windows, that's why you don't see the red and blue lines 
 
 > 2. *Evolution of the features as a function of time.*
 > 3. *LIME graph :* Ce graphique nous permet de représenter le poids que le modèle ML donne à chaque feature et donc l'importance de celle-ci. Nous avons choisi ce graphe car il est facile à interpréter et compréhensible vu que Lime propose des explications aisément compréhensibles.
-> ![ Lime graph ](Lime.jpeg)
+> ![ Lime graph ](imgs/Lime.jpeg)
 <p><center> Figure.13: Lime graph </center></p><html>
 
 >Le slider en bas du graphe nous permettra de modifier l'instant d'affichage
@@ -196,12 +196,12 @@ In this plot we have deactivated the display of the real and predicted seizure w
 
 The interaction with our tool when the user is the Doctor is as follows: 
 
- ![Diagramme de séquence ](Diagramme_de_séquence.jpg)
+ ![Diagramme de séquence ](imgs/Diagramme_de_séquence.jpg)
    <p><center> Figure.14: Sequence chart </center></p><html>
 
 #### 4-2 Sequence diagram for the data scientist
 The interaction with our tool when the user is the data scientist is as follows: 
 
- ![sequence chart  ](Diagramme_de_sequence1.jpg)
+ ![sequence chart  ](imgs/Diagramme_de_sequence1.jpg)
 
    <p><center> Figure.15:saquence chart </center></p><html>
