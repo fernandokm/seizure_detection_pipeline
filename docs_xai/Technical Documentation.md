@@ -6,13 +6,13 @@
 
 The application of artificial intelligence in the medical field requires a high level of reliability. Given the great consequences that a false prediction can have on the quality of life of patients, it has become essential to use analysis tools that allow the **data scientist** to optimize their utility.
 
-Otherwise, using a diagnostic tool based on artificial intelligence can generate mistrust among **doctors** because these algorithms are generally difficult to understand at first glance due to their complexity. However, doctors must have confidence in these algorithms since they are responsible for letting their patients use the tool. To generate this confidence, it is therefore important that doctors understand the underlying mechanisms of the algorithm.
+Moreover, using a diagnostic tool based on artificial intelligence can generate mistrust among **doctors** because these algorithms are generally difficult to understand at first glance due to their complexity. However, doctors must have confidence in these algorithms since they are responsible for letting their patients use the tool. To generate this confidence, it is therefore important that doctors understand the underlying mechanisms of the algorithm.
 
 ### 1-2 Stakeholders
 
-**Data scientist team:** The first stakeholder of our project is the data scientist team who wants to improve the performance and accuracy of their Machine Learning algorithm to ensure its proper functioning through a good understanding and deep analysis of the explanations of how the algorithm works. Their final goal is to present their model to the doctors, explain it and gain their confidence in the model.
+**Data scientist team:** The first stakeholder of our project is the data scientist team, who wants to improve the performance and accuracy of their Machine Learning algorithm to ensure its proper functioning through a good understanding and deep analysis of the explanations of how the algorithm works. The data scientist's final goal is to present their model to the doctors, explain it and gain their confidence in the model.
 
-**Doctors:** The second stakeholder is the medical team. We need to provide them with an understandable and transparent solution to generate confidence in the solution.
+**Doctors:** The second stakeholder is the medical team, who needs an understandable and transparent model to obtain confidence in the solution.
 
 ### 1-3 Choice of explanation type
 
@@ -27,7 +27,7 @@ After having fixed the types of explanations to be provided, it is also necessar
 
 - _Readability:_ The user must be able to use our tool as easily as possible, therefore our graphic explanations must be well titled, equipped with color codes and legends, etc.
 - _Fluidity:_ Our tool must be fluid despite the large size of the data, the waiting time of the user must also be limited to ensure the proper use of the tool.
-- _Resilience:_ The tool must be adaptable to a change of model (model-agnostic) as well as being adapted to the two databases TUH and TEPPE.
+- _Resilience:_ The tool must be adaptable to a change of model (i.e. it must be model-agnostic) as well as being adapted to the two databases TUH and TEPPE.
 
 ## 2 General architecture of the project
 
@@ -45,7 +45,7 @@ For the explainability pipeline, we used Lime and SHAP, two Python libraries for
 
 **Lime** (Local Interpretable Model-agnostic Explanations): it allows us to build a linear model around each prediction to explain how the model works locally.
 
-- Lime on the one hand facilitates the interpretability of the model thanks to the approximation with a linear model, and on the other hand, allows us to have "local fidelity", i.e. we will know which are the most important features for a local prediction, since this may be different from the globally important features of the model.
+- Lime facilitates the interpretability of the model thanks to the approximation with a linear model. This, in turn, allows us to have "local fidelity", i.e. to know which features are important for a local prediction (as opposed to a global prediction).
 
 - This would be useful when studying the predictions of the model for a specific patient.
 
